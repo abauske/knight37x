@@ -74,7 +74,7 @@ public class ItemLance extends ItemSword {
 	
 	private int leftClickCounter = 0;
 	
-	private Item switchTo;
+	private ItemLance switchTo;
 	
 	//------------------Sended Data---------------------------
 	
@@ -93,13 +93,25 @@ public class ItemLance extends ItemSword {
 	@Override
 	@SideOnly(Side.CLIENT)
 	public void registerIcons(IIconRegister reg) {
-		this.itemIcon = reg.registerIcon("Lance:lance" + this.getMaterialString());
+		this.itemIcon = reg.registerIcon("lance:lance" + this.getMaterialString());
 	}
 	
 	public String getMaterialString() {
 		return "";
 	}
 	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void func_150895_a(Item item, CreativeTabs tab, List list) {
+		list.add(new ItemStack(item, 1, 0));
+	}
+	
+	@Override
+	public int getItemEnchantability() {
+		return 14;
+	}
+
 	@SideOnly(Side.CLIENT)
 
     /**
@@ -110,6 +122,21 @@ public class ItemLance extends ItemSword {
         return false;
     }
 
+	@Override
+	public ItemStack onItemRightClick(ItemStack itemstack, World par2World, EntityPlayer par3EntityPlayer) {
+		if(this.getSwitch() != null) {
+			ItemStack newLance = new ItemStack(this.getSwitch(), 1);
+			EnchantmentHelper.setEnchantments(EnchantmentHelper.getEnchantments(itemstack), newLance);
+			newLance.setItemDamage(itemstack.getItemDamage());
+			return newLance;
+		}
+		return itemstack;
+	}
+	
+	public Item getSwitch() {
+		return null;
+	}
+	
     /**
      * returns the action that specifies what animation to play when the items is being used
      */
@@ -120,6 +147,7 @@ public class ItemLance extends ItemSword {
 
     @Override
 	public void onUpdate(ItemStack par1ItemStack, World world, Entity entity, int par4, boolean par5) {
+//    	System.out.print(Item.field_150901_e.getObject("iron_lance_on"));
     	this.player = null;
     	this.world = world;
 		if(entity != null && entity instanceof EntityPlayer) {

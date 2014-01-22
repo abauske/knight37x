@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,7 +21,6 @@ public class ItemLanceUp extends Item {
 	private final String material;
 	
 	public ItemLanceUp(Item switchTo, String material) {
-		super();
 		setCreativeTab(CreativeTabs.tabCombat);
 		this.switchTo = switchTo;
 		this.material = material;
@@ -49,11 +49,17 @@ public class ItemLanceUp extends Item {
     {
         return EnumAction.none;
     }
+	
+	@Override
+	public int getItemEnchantability() {
+		return 14;
+	}
 
     @Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World par2World, EntityPlayer par3EntityPlayer) {
     	if(this.switchTo != null) {
 			ItemStack newLance = new ItemStack(this.switchTo, 1);
+			EnchantmentHelper.setEnchantments(EnchantmentHelper.getEnchantments(itemstack), newLance);
 			newLance.setItemDamage(itemstack.getItemDamage());
 			return newLance;
     	}

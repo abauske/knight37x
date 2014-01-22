@@ -56,7 +56,7 @@ public class Lance {
 	// All Variables:
 	// Lances:
 
-	public static Item lanceOnIron;
+	public static Item lanceOnIron = (Item) Item.field_150901_e.getObject("iron_lance_on");
 	private int lanceOnIronID = 450;
 	
 	public static Item lanceUpIron;
@@ -136,21 +136,25 @@ public class Lance {
 		
 		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceiron");
 		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat);
-//		lanceOnDia = new ItemLance(10, "Dia").setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
+//		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
 //		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Dia").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
-
-		GameData.itemRegistry.add(lanceOnIronID, "iron_lance_on", lanceOnIron);
-		System.out.print(GameData.itemRegistry.getObject("iron_lance_on"));
-//		lanceOnIron = (Item)Item.field_150901_e.getObject("iron_lance_on");
+		
+		GameRegistry.registerCustomItemStack("iron_lance_on", new ItemStack(lanceOnIron));
+		
+		Item.field_150901_e.func_148741_d("iron_lance_on");
+		Item.field_150901_e.func_148750_c(lanceOnIron);
+		Item.field_150901_e.func_148756_a(lanceOnIronID, "iron_lance_on", lanceOnIron);
+		Item.field_150901_e.func_148757_b(lanceOnIron);
+//		Item.field_150901_e.putObject(lanceOnIron, lanceOnIron);
 		
 		shaft = new ItemShaft().setCreativeTab(CreativeTabs.tabMisc).setUnlocalizedName("shaft");
 		if(this.createTestBlock) {
 			testBlock = new TestBlock().func_149647_a(CreativeTabs.tabBlock).func_149663_c("testBlock").func_149658_d("testBlock");
 		}
 		
-//		registerItems();
+		registerItems();
 //		registerLanguage();
-//		registerRecipes();
+		registerRecipes();
 		
 		proxy.registerRenderers();
 	}
@@ -207,10 +211,10 @@ public class Lance {
 	
 	private void registerItems()
 	{
-		GameRegistry.registerItem(lanceOnIron, "lanceI");
-		GameRegistry.registerItem(lanceUpIron, "lanceUpI");
-		GameRegistry.registerItem(lanceOnDia, "lanceD");
-		GameRegistry.registerItem(lanceUpDia, "lanceUpD");
+		GameRegistry.registerItem(lanceOnIron, "iron_lance_on");
+		GameRegistry.registerItem(lanceUpIron, "iron_lance_up");
+//		GameRegistry.registerItem(lanceOnDia, "diamond_lance_on");
+//		GameRegistry.registerItem(lanceUpDia, "diamon_lance_up");
 		
 		GameRegistry.registerItem(shaft, "shaft");
 		
