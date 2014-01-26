@@ -7,9 +7,12 @@ import io.netty.channel.ChannelHandler.Sharable;
 
 import java.io.ByteArrayInputStream;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.DamageSource;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
@@ -36,42 +39,50 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 			try {
 				ByteBuf payload = packet.payload();
 				MinecraftServer server = MinecraftServer.getServer();
-				int flag = payload.readInt();
 				int playerID = payload.readInt();
 				Item item = null;
+				EntityPlayer player = null;
 				for(Object obj : server.getEntityWorld().playerEntities) {
 					if(obj instanceof EntityPlayer) {
-						EntityPlayer player = (EntityPlayer) obj;
+						EntityPlayer p = (EntityPlayer) obj;
 //						System.out.println(player.func_145782_y());
-						if(player.func_145782_y() == playerID) {
-							item = player.getCurrentEquippedItem().getItem();
+						if(p.func_145782_y() == playerID) {
+							player = p;
+							item = p.getCurrentEquippedItem().getItem();
+							break;
 						}
 					}
 				}
-				
-				if(item instanceof ItemLance) {
+
+				Entity entity = ItemLance.getRightEntity(server.getEntityWorld(), payload.readInt());
+				if(item instanceof ItemLance && player != null && entity != null) {
 					ItemLance lance = (ItemLance) item;
 					
+					lance.attack((EntityLiving) entity, player, payload.readFloat());
+					lance.damageLance(payload.readBoolean(), entity, player);
 					
-					if (flag == 0) {
-						lance.entity(payload.readInt(), null, server.getEntityWorld());
-						
-						
-					} else if (flag == 1) {
-						float value = payload.readFloat();
-						if (lance.hitValue < value || lance.hitTime < server.getSystemTimeMillis()) {
-							lance.hitValue = value;
-							lance.hitTime = server.getSystemTimeMillis() + 200;
-						}
-						
-						
-					} else if (flag == 2) {
-						lance.fwdTime = server.getSystemTimeMillis() + 200;
-					}
+					
+					
+//					if (flag == 0) {
+//						lance.entity(payload.readInt(), null, server.getEntityWorld());
+//						
+//						
+//					} else if (flag == 1) {
+//						float value = payload.readFloat();
+//						if (lance.hitValue < value || lance.hitTime < server.getSystemTimeMillis()) {
+//							lance.hitValue = value;
+//							lance.hitTime = server.getSystemTimeMillis() + 200;
+//						}
+//						
+//						
+//					} else if (flag == 2) {
+//						lance.fwdTime = server.getSystemTimeMillis() + 200;
+//					}
 				}
-		} catch(Exception e) {
-			System.out.println("problem");
-		}
+			} catch(Exception e) {
+				e.printStackTrace();
+				System.out.println("problem");
+			}
 		}
 		
 //		MinecraftServer server = MinecraftServer.getServer();

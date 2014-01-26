@@ -45,8 +45,6 @@ import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
-import net.minecraft.potion.Potion;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.AxisAlignedBB;
@@ -156,7 +154,8 @@ public class ItemLance extends ItemSword {
 			this.player = player;
 			if(this.isRunningOnClient()) {
 				if(Minecraft.getMinecraft().gameSettings.keyBindForward.func_151470_d()) {
-					this.sendIsForwardKeyPressed(true, (EntityClientPlayerMP) player);
+					this.fwdTime = Minecraft.getSystemTime() + 200;
+//					this.sendIsForwardKeyPressed(true, (EntityClientPlayerMP) player);
 	    		}
 				
 				this.hit = 0.0F;
@@ -182,7 +181,9 @@ public class ItemLance extends ItemSword {
 				
 				
 				if(hit != 0) {
-					this.sendHitValue(hit, (EntityClientPlayerMP) player);
+					this.hitValue = hit;
+					this.hitTime = Minecraft.getSystemTime() + 200;
+//					this.sendHitValue(hit, (EntityClientPlayerMP) player);
 				}
 			}
 			
@@ -190,7 +191,8 @@ public class ItemLance extends ItemSword {
 			if(player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemLance) {
 				if (this.isRunningOnClient() && this.getMouseOver() != null) {
 					Entity aim = this.getMouseOver();
-					this.sendID(aim.func_145782_y(), (EntityClientPlayerMP) player);
+					this.entity(aim.func_145782_y(), player, world);
+//					this.sendID(aim.func_145782_y(), (EntityClientPlayerMP) player);
 				}
 				if(player.getCurrentEquippedItem() != null) {
 					if(((EntityPlayer) entity).getCurrentEquippedItem().getItemDamage() >= ((EntityPlayer) entity).getCurrentEquippedItem().getMaxDamage()) {
@@ -234,18 +236,21 @@ public class ItemLance extends ItemSword {
     	
     	Entity aim = this.getRightEntity(world, aimid);
     	if (player != null && aim instanceof EntityLiving && player.getDistanceToEntity(aim) <= 12 && !aim.isDead) {
-			boolean attacked = this.attack((EntityLiving) aim, player);
-			if (attacked && player.getCurrentEquippedItem() != null) {
+			this.CalcAttack((EntityLiving) aim, player);
+		}
+    }
+    
+    public void damageLance(boolean attacked, Entity aim, EntityPlayer player) {
+    	if (attacked && player.getCurrentEquippedItem() != null) {
+			this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
+		}
+		int armor = ((EntityLiving) aim).getTotalArmorValue();
+		if (attacked && Lance.shouldTakeDamageFromArmour && this.counter1 >= 10) {
+			this.counter1 = 0;
+			if(armor > 0) {
+				this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + (int) ((100 / (11 - (armor / 2))) / 10) * Lance.armorBehaviour);
+			} else {
 				this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
-			}
-			int armor = ((EntityLiving) aim).getTotalArmorValue();
-			if (attacked && Lance.shouldTakeDamageFromArmour && this.counter1 >= 10) {
-				this.counter1 = 0;
-				if(armor > 0) {
-					this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + (int) ((100 / (11 - (armor / 2))) / 10) * Lance.armorBehaviour);
-				} else {
-					this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
-				}
 			}
 		}
     }
@@ -362,7 +367,7 @@ public class ItemLance extends ItemSword {
 	public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
 		return true;
 	}
-/*
+	
 	private void knockBack(EntityLiving entity, EntityPlayer player) {
 		int speed;
 		if(player.isSprinting()) {
@@ -392,37 +397,40 @@ public class ItemLance extends ItemSword {
         for(int i = 0; i < speed; i++) {
         	entity.knockBack(player, speed, d0, d1);
         }
-	}*/
+	}
 
-	private boolean attack(EntityLiving entity, EntityPlayer player) {
+	private void CalcAttack(EntityLiving entity, EntityPlayer player) {
 		boolean isForwardKeyPressed = false;
-		if(this.fwdTime >= MinecraftServer.getSystemTimeMillis()) {
+		if(this.fwdTime >= Minecraft.getSystemTime()) {
 			isForwardKeyPressed = true;
 		}
 		float hitUse = 0;
 		
-		if(this.hitTime >= MinecraftServer.getSystemTimeMillis()) {
+		if(this.hitTime >= Minecraft.getSystemTime()) {
 			hitUse = Math.abs(this.hitValue) * 4;
 		}
-		if(hitUse != 0 || player.getDistanceToEntity(entity) <= 6) {
+		if((hitUse != 0 || player.getDistanceToEntity(entity) <= 6) && isForwardKeyPressed) {
 			float hurt = 0;
-			if(player.isSprinting()) {
+			if(player.isRiding()) {
+				Entity ridingEntity = player.ridingEntity;
+				if(ridingEntity instanceof EntityPig) {
+					hurt = 1F;
+					hurt *= 1.1;
+				} else if(ridingEntity != null) {
+					double speed = this.getSpeed((EntityLiving) ridingEntity);
+					System.out.println(speed);
+					hurt += speed;
+				} else if(isForwardKeyPressed) {
+					hurt += 1F;
+				}
+//				if(player.isSprinting()) {
+//					hurt *= 1.3F;
+//				}
+			} else if(player.isSprinting()) {
 				if(isForwardKeyPressed) {
 					hurt += 3F;
 				}
 				hurt *= 1.2F;
-			} else if(player.isRiding()) {
-				Entity ridingEntity = player.ridingEntity;
-				if(ridingEntity instanceof EntityPig) {
-					if(isForwardKeyPressed) {
-						hurt += 1F;
-					}
-					hurt *= 1.1;
-				} else if(ridingEntity != null) {
-					hurt += this.getSpeed((EntityLiving) ridingEntity);
-				} else if(isForwardKeyPressed) {
-					hurt += 1F;
-				}
 			} else if(player.isSneaking()) {
 				hurt *= 0.2F;
 			} else if(isForwardKeyPressed) {
@@ -432,13 +440,19 @@ public class ItemLance extends ItemSword {
 			hurt /= 10;
 			hurt *= this.getStrengh();
 			if(hurt != 0) {
-				entity.attackEntityFrom(DamageSource.causePlayerDamage(player), hurt);
+//				entity.attackEntityFrom(DamageSource.causePlayerDamage(player), hurt);
 				if(!player.capabilities.isCreativeMode && Lance.shouldLanceBreak) {
-					return true;
+					this.send(entity.func_145782_y(), hurt, (EntityClientPlayerMP) player, true);
+				} else {
+					this.send(entity.func_145782_y(), hurt, (EntityClientPlayerMP) player, false);
 				}
 			}
 		}
-		return false;
+	}
+	
+	public void attack(EntityLiving entity, EntityPlayer player, float value) {
+		entity.attackEntityFrom(DamageSource.causePlayerDamage(player), value);
+//		this.knockBack(entity, player);
 	}
 	
 	public int getStrengh() {
@@ -454,7 +468,7 @@ public class ItemLance extends ItemSword {
 		return this.getRightEntity(world, entity.func_145782_y());
 	}
 	
-	private Entity getRightEntity(World world, int id) {
+	public static Entity getRightEntity(World world, int id) {
 		List list = world.loadedEntityList;
 		for(int i = 0; i < world.loadedEntityList.size(); i++) {
 			Entity current = (Entity) list.toArray()[i];
@@ -475,54 +489,66 @@ public class ItemLance extends ItemSword {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void sendID(Entity entity, EntityClientPlayerMP player)  {
-		this.sendID(entity.func_145782_y(), player);
-	}
-	
-	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void sendID(int id, EntityClientPlayerMP player) {
+	private void send(int entityID, float hurt, EntityClientPlayerMP player, boolean takeDamage)  {
 		ByteBuf data = buffer(4);
-		data.writeInt(0);
 		data.writeInt(player.func_145782_y());
-		data.writeInt(id);
+		data.writeInt(entityID);
+		data.writeFloat(hurt);
+		data.writeBoolean(takeDamage);
 		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
 		player.sendQueue.func_147297_a(packet);
-		
-//		if(this.counter2 > 15) {
-//			this.counter2 = 0;
-//			player.sendChatMessage("/send entity " + id);
-//		}
 	}
 	
-	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
-		ByteBuf data = buffer(4);
-		data.writeInt(1);
-		data.writeInt(player.func_145782_y());
-		data.writeFloat(hitValue);
-		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-		player.sendQueue.func_147297_a(packet);
-		
-//		player.sendChatMessage("/send hit " + hitValue);
-	}
 	
-	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void sendIsForwardKeyPressed(boolean isForwardKeyPressed, EntityClientPlayerMP player)  {
-//		Lance.packetPipeline.sendTo(new PacketHandler2(), player);
-		
-		if(isForwardKeyPressed) {
-			ByteBuf data = buffer(4);
-			data.writeInt(2);
-			data.writeInt(player.func_145782_y());
-			C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-	        player.sendQueue.func_147297_a(packet);
-		}
-		
-//		if(isForwardKeyPressed && this.counter3 > 15) {
-//			this.counter3 = 0;
-//			player.sendChatMessage("/send fwd " + isForwardKeyPressed);
+//	@SubscribeEvent(priority = EventPriority.NORMAL)
+//	private void sendID(Entity entity, EntityClientPlayerMP player)  {
+//		this.sendID(entity.func_145782_y(), player);
+//	}
+//	
+//	@SubscribeEvent(priority = EventPriority.NORMAL)
+//	private void sendID(int id, EntityClientPlayerMP player) {
+//		ByteBuf data = buffer(4);
+//		data.writeInt(0);
+//		data.writeInt(player.func_145782_y());
+//		data.writeInt(id);
+//		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
+//		player.sendQueue.func_147297_a(packet);
+//		
+////		if(this.counter2 > 15) {
+////			this.counter2 = 0;
+////			player.sendChatMessage("/send entity " + id);
+////		}
+//	}
+//	
+//	@SubscribeEvent(priority = EventPriority.NORMAL)
+//	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
+//		ByteBuf data = buffer(4);
+//		data.writeInt(1);
+//		data.writeInt(player.func_145782_y());
+//		data.writeFloat(hitValue);
+//		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
+//		player.sendQueue.func_147297_a(packet);
+//		
+////		player.sendChatMessage("/send hit " + hitValue);
+//	}
+//	
+//	@SubscribeEvent(priority = EventPriority.NORMAL)
+//	private void sendIsForwardKeyPressed(boolean isForwardKeyPressed, EntityClientPlayerMP player)  {
+////		Lance.packetPipeline.sendTo(new PacketHandler2(), player);
+//		
+//		if(isForwardKeyPressed) {
+//			ByteBuf data = buffer(4);
+//			data.writeInt(2);
+//			data.writeInt(player.func_145782_y());
+//			C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
+//	        player.sendQueue.func_147297_a(packet);
 //		}
-	}
+//		
+////		if(isForwardKeyPressed && this.counter3 > 15) {
+////			this.counter3 = 0;
+////			player.sendChatMessage("/send fwd " + isForwardKeyPressed);
+////		}
+//	}
 	
 	public boolean isRunningOnClient() {
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
