@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderLanceUp implements IItemRenderer {
 	protected ModelLanceUp model = new ModelLanceUp();
-	private ResourceLocation texture = new ResourceLocation("textures/models/mod/modelLanceUpIron.png");
+	private ResourceLocation texture = new ResourceLocation("textures/models/modelLanceUpIron.png");
 	
 	public RenderLanceUp(String location) {
 		this.texture = new ResourceLocation(location);

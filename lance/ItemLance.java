@@ -1,8 +1,10 @@
 package knight37x.lance;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.embedded.EmbeddedChannel;
+import static io.netty.buffer.Unpooled.buffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -12,6 +14,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -40,6 +44,7 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.potion.Potion;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.stats.AchievementList;
@@ -56,7 +61,9 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 
 public class ItemLance extends ItemSword {
 
-	private int counter = 0;
+	private int counter1 = 0;
+	private int counter2 = 0;
+	private int counter3 = 0;
 	
 	private EntityPlayer player;				//The player that has the lance in his inventory
 	private World world;						//Current world
@@ -87,7 +94,7 @@ public class ItemLance extends ItemSword {
 	
 	public ItemLance() {
 		super(ToolMaterial.IRON);
-		setCreativeTab(CreativeTabs.tabCombat);
+		setCreativeTab(null);
 	}
 	
 	@Override
@@ -182,7 +189,6 @@ public class ItemLance extends ItemSword {
 				
 				if(hit != 0) {
 					this.sendHitValue(hit, (EntityClientPlayerMP) player);
-					System.out.print(GameData.itemRegistry.contains("iron"));
 				}
 			}
 			
@@ -204,9 +210,19 @@ public class ItemLance extends ItemSword {
 			this.leftClickCounter--;
 		}
 		
-		this.counter++;
-		if(this.counter > 9000) {
-			this.counter = 20;
+		this.counter1++;
+		if(this.counter1 > 9000) {
+			this.counter1 = 20;
+		}
+		
+		this.counter2++;
+		if(this.counter2 > 9000) {
+			this.counter2 = 20;
+		}
+		
+		this.counter3++;
+		if(this.counter3 > 9000) {
+			this.counter3 = 20;
 		}
 	}
     
@@ -229,8 +245,8 @@ public class ItemLance extends ItemSword {
 				this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
 			}
 			int armor = ((EntityLiving) aim).getTotalArmorValue();
-			if (attacked && Lance.shouldTakeDamageFromArmour && this.counter >= 10) {
-				this.counter = 0;
+			if (attacked && Lance.shouldTakeDamageFromArmour && this.counter1 >= 10) {
+				this.counter1 = 0;
 				if(armor > 0) {
 					this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + (int) ((100 / (11 - (armor / 2))) / 10) * Lance.armorBehaviour);
 				} else {
@@ -464,22 +480,66 @@ public class ItemLance extends ItemSword {
 		}
 	}
 	
+	private int getPlayerNumber(EntityClientPlayerMP player) {
+		Object[] obj = MinecraftServer.getServer().getEntityWorld().playerEntities.toArray();
+//		EntityPlayer[] players = (EntityPlayer[]) MinecraftServer.getServer().getEntityWorld().playerEntities.toArray();
+		for(int i = 0; i < obj.length; i++) {
+			if(obj[i] != null && (obj[i] instanceof EntityPlayer || obj[i] instanceof EntityPlayerMP)) {
+				if(((EntityPlayer) obj[i]).getCommandSenderName().equals(player.getCommandSenderName())) {
+				return i+1;
+				}
+			}
+		}
+		return 0;
+	}
+	
+	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendID(Entity entity, EntityClientPlayerMP player)  {
 		this.sendID(entity.func_145782_y(), player);
 	}
 	
+	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendID(int id, EntityClientPlayerMP player) {
-		player.sendChatMessage("/send entity " + id);
-	}
-	
-	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
-		player.sendChatMessage("/send hit " + hitValue);
-	}
-	
-	private void sendIsForwardKeyPressed(boolean isForwardKeyPressed, EntityClientPlayerMP player)  {
-		if(isForwardKeyPressed) {
-			player.sendChatMessage("/send fwd " + isForwardKeyPressed);
+		if(this.getPlayerNumber(player) != 0) {
+			ByteBuf data = buffer(4);
+			data.writeInt(this.getPlayerNumber(player) - 1);
+			data.writeInt(id);
+			C17PacketCustomPayload packet = new C17PacketCustomPayload("lanceHitEntity", data);
+	        player.sendQueue.func_147297_a(packet);
 		}
+		
+//		if(this.counter2 > 15) {
+//			this.counter2 = 0;
+//			player.sendChatMessage("/send entity " + id);
+//		}
+	}
+	
+	@SubscribeEvent(priority = EventPriority.NORMAL)
+	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
+		if(this.getPlayerNumber(player) != 0) {
+			ByteBuf data = buffer(4);
+			data.writeInt(this.getPlayerNumber(player) - 1);
+			data.writeFloat(hitValue);
+			C17PacketCustomPayload packet = new C17PacketCustomPayload("lanceHitValue", data);
+	        player.sendQueue.func_147297_a(packet);
+		}
+		
+//		player.sendChatMessage("/send hit " + hitValue);
+	}
+	
+	@SubscribeEvent(priority = EventPriority.NORMAL)
+	private void sendIsForwardKeyPressed(boolean isForwardKeyPressed, EntityClientPlayerMP player)  {
+		if(isForwardKeyPressed && this.getPlayerNumber(player) != 0) {
+			ByteBuf data = buffer(4);
+			data.writeInt(this.getPlayerNumber(player) - 1);
+			C17PacketCustomPayload packet = new C17PacketCustomPayload("lanceIsForward", data);
+	        player.sendQueue.func_147297_a(packet);
+		}
+		
+//		if(isForwardKeyPressed && this.counter3 > 15) {
+//			this.counter3 = 0;
+//			player.sendChatMessage("/send fwd " + isForwardKeyPressed);
+//		}
 	}
 	
 	public boolean isRunningOnClient() {

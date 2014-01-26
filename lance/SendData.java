@@ -63,6 +63,14 @@ public class SendData extends CommandBase {
 			
 		}
 	}
+	
+	@Override
+	public boolean canCommandSenderUseCommand(ICommandSender sender) {
+		if(sender instanceof EntityPlayer) {
+			return true;
+		}
+		return false;
+	}
 
 	@Override
 	public int compareTo(Object arg0) {

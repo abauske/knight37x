@@ -1,44 +1,77 @@
 package knight37x.lance;
 
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
 
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.Packet;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.server.MinecraftServer;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
-public class PacketHandler extends NetworkManager
-{
-	public static int entityID;
-	public static boolean isForwardKeyPressed;
+@Sharable
+public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 
-	public PacketHandler(boolean p_i45147_1_) {
-		super(p_i45147_1_);
-	}
-
+//	@Override
+//    protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
+//		System.out.println(12);
+//        if (packet.channel().equals("lance")) {
+//            ByteBuf payload = packet.payload();
+//            if (payload.readableBytes() == 4) {
+//                int number = payload.readInt();
+//                System.out.println("number = " + number);
+//            }
+//        }
+//    }
+	
 	@Override
-	protected void channelRead0(ChannelHandlerContext handler, Packet packet) {
-		if(packet.func_148835_b().equals("lance")) {
-			
-		}
+	protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
+//		MinecraftServer server = MinecraftServer.getServer();
+//		Item item = ((EntityPlayer) server.getEntityWorld().playerEntities.toArray()[packet.payload().readInt()]).getCurrentEquippedItem().getItem();
+//		
+//		if(item instanceof ItemLance) {
+//			ItemLance lance = (ItemLance) item;
+//			
+//			
+//			if (packet.channel().equals("lanceHitEntity")) {
+//				lance.entity(packet.payload().readInt(), null, server.getEntityWorld());
+//				
+//				
+//			} else if (packet.channel().equals("lanceHitValue")) {
+//				float value = packet.payload().readFloat();
+//				if (lance.hitValue < value || lance.hitTime < server.getSystemTimeMillis()) {
+//					lance.hitValue = value;
+//					lance.hitTime = server.getSystemTimeMillis() + 200;
+//				}
+//				
+//				
+//			} else if (packet.channel().equals("lanceIsForward")) {
+//				lance.fwdTime = server.getSystemTimeMillis() + 200;
+//			}
+//		}
+		
 	}
 	
 	
 //	@Override
 //    public void onPacketData(INetworkManager manager, Packet250CustomPayload packet, Player player)
 //	{
-//		if (packet.channel.equals("lance"))
+//		if (packet.channel().equals("lance"))
 //		{
 //			handlePacket(packet);
-//		} else if (packet.channel.equals("lanceHitEntity"))
+//		} else if (packet.channel().equals("lanceHitEntity"))
 //		{
 //			handlePacketHitEntity(packet);
-//		} else if (packet.channel.equals("lanceHitValue"))
+//		} else if (packet.channel().equals("lanceHitValue"))
 //		{
 //			handlePacketHitValue(packet);
-//		} else if (packet.channel.equals("lanceIsForward"))
+//		} else if (packet.channel().equals("lanceIsForward"))
 //		{
 //			handlePacketIsForwardKeyPressed(packet);
 //		}

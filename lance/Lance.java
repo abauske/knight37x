@@ -1,9 +1,6 @@
 package knight37x.lance;
 
 import java.util.Locale.Category;
-
-import com.sun.servicetag.Registry;
-
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.FolderResourcePack;
@@ -52,6 +49,8 @@ public class Lance {
 	public static LanceCommonProxy proxy;
 //	public static LanceClientProxy cProxy = new LanceClientProxy();
 	
+	public static final PacketPipeline packetPipeline = new PacketPipeline();
+	
 	//-----------------------------------------------------------
 	// All Variables:
 	// Lances:
@@ -83,11 +82,6 @@ public class Lance {
 	public static Item shaft;
 	private int shaftID = 460;
 	
-	// Test Block:
-	public static Block testBlock;
-	private static int testBlockID = 249;
-	private static boolean createTestBlock = false;
-	
 	//Other Configurations:
 	public static boolean shouldLanceBreak = true;
 	private int numberOfHits = 500;
@@ -113,9 +107,6 @@ public class Lance {
 		
 		shaftID = config.get("ItemIDs", "Shaft ID", 460).getInt();
 		
-		createTestBlock = config.get("designer stuff", "Create Test Block (Dont use it)", false).getBoolean(false);
-		testBlockID = config.get("designer stuff", "Test Block ID (Dont use)", 249).getInt();
-		
 		shouldLanceBreak = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take damage?", true).getBoolean(true);
 		shouldTakeDamageFromArmour = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take more damage when hitting an armoured mob?", true).getBoolean(true);
 		
@@ -129,38 +120,34 @@ public class Lance {
 		}
 		
 		config.save();
+		
+		// ---------------------------------------------------------------------------------------------------------------------------------
+		
+		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceiron");
+		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat);
+		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6);
+		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Diamond").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
+		
+		shaft = new ItemShaft().setCreativeTab(CreativeTabs.tabMaterials).setUnlocalizedName("shaft");
+		
+		registerItems();
+		registerRecipes();
 	}
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
+		packetPipeline.initalise();
 		
-		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceiron");
-		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat);
-//		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
-//		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Dia").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
-		
-		GameRegistry.registerCustomItemStack("iron_lance_on", new ItemStack(lanceOnIron));
-		
-		Item.field_150901_e.func_148741_d("iron_lance_on");
-		Item.field_150901_e.func_148750_c(lanceOnIron);
-		Item.field_150901_e.func_148756_a(lanceOnIronID, "iron_lance_on", lanceOnIron);
-		Item.field_150901_e.func_148757_b(lanceOnIron);
-//		Item.field_150901_e.putObject(lanceOnIron, lanceOnIron);
-		
-		shaft = new ItemShaft().setCreativeTab(CreativeTabs.tabMisc).setUnlocalizedName("shaft");
-		if(this.createTestBlock) {
-			testBlock = new TestBlock().func_149647_a(CreativeTabs.tabBlock).func_149663_c("testBlock").func_149658_d("testBlock");
-		}
-		
-		registerItems();
-//		registerLanguage();
-		registerRecipes();
+//		NetworkRegistry.INSTANCE.newChannel("lanceHitEntity", new PacketHandler());
+//		NetworkRegistry.INSTANCE.newChannel("lanceHitValue", new PacketHandler());
+//		NetworkRegistry.INSTANCE.newChannel("lanceIsForward", new PacketHandler());
 		
 		proxy.registerRenderers();
 	}
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
+		packetPipeline.postInitialise();
 		
 		if(this.isAvailable("ingotCopper")) {
 			lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4);
@@ -196,15 +183,21 @@ public class Lance {
 	}
 	
 	@EventHandler
-	public void serverStart(FMLServerStartingEvent event){
-		((CommandHandler) MinecraftServer.getServer().getCommandManager()).registerCommand(new SendData());
+	public void serverLoad(FMLServerStartingEvent event) {
 	}
+	
+//	@EventHandler
+//	public void serverStart(FMLServerStartingEvent event){
+//		SendData file = new SendData();
+//		event.registerServerCommand(file);
+////		((CommandHandler) MinecraftServer.getServer().getCommandManager()).registerCommand(new SendData());
+//	}
 	
 	private void registerRecipes()
 	{
-		CraftingManager.getInstance().addRecipe(new ItemStack(shaft, 3), "#  ", " # ", "  #", '#', Items.stick);
+//		CraftingManager.getInstance().addRecipe(new ItemStack(shaft, 3), "#  ", " # ", "  #", '#', Items.stick);
 //		GameRegistry.addRecipe(new ItemStack(shaft, 3), "#  ", " # ", "  #", '#', Items.stick);
-//		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
+		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpIron, "  X", " # ", "#  ", '#', shaft, 'X', Items.iron_ingot));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpDia, "  X", " # ", "#  ", '#', shaft, 'X', Items.diamond));
 	}
@@ -213,30 +206,10 @@ public class Lance {
 	{
 		GameRegistry.registerItem(lanceOnIron, "iron_lance_on");
 		GameRegistry.registerItem(lanceUpIron, "iron_lance_up");
-//		GameRegistry.registerItem(lanceOnDia, "diamond_lance_on");
-//		GameRegistry.registerItem(lanceUpDia, "diamon_lance_up");
+		GameRegistry.registerItem(lanceOnDia, "diamond_lance_on");
+		GameRegistry.registerItem(lanceUpDia, "diamon_lance_up");
 		
 		GameRegistry.registerItem(shaft, "shaft");
-		
-		// Test Block:
-		if(this.createTestBlock) {
-			GameRegistry.registerBlock(testBlock, "testBlock");
-		}
-	}
-	
-	private void registerLanguage()
-	{
-		LanguageRegistry.addName(lanceOnIron, "Iron Lance");
-		LanguageRegistry.addName(lanceUpIron, "Iron Lance");
-		LanguageRegistry.addName(lanceOnDia, "Diamond Lance");
-		LanguageRegistry.addName(lanceUpDia, "Diamond Lance");
-		
-		LanguageRegistry.addName(shaft, "Lance Shaft");
-		
-		// Test Block:
-		if(this.createTestBlock) {
-			LanguageRegistry.addName(testBlock, "Test Block");
-		}
 	}
 	
 	private boolean isAvailable(String item) {
