@@ -162,7 +162,7 @@ public class ItemLance extends ItemSword {
 			this.player = player;
 			if(this.isRunningOnClient()) {
 				if(Minecraft.getMinecraft().gameSettings.keyBindForward.func_151470_d()) {
-	    			this.sendIsForwardKeyPressed(true, (EntityClientPlayerMP) player);
+					this.sendIsForwardKeyPressed(true, (EntityClientPlayerMP) player);
 	    		}
 				
 				this.hit = 0.0F;
@@ -409,6 +409,7 @@ public class ItemLance extends ItemSword {
 		
 		if(this.hitTime >= MinecraftServer.getSystemTimeMillis()) {
 			hitUse = Math.abs(this.hitValue) * 4;
+			System.out.println(hitUse);
 		}
 		if(hitUse != 0 || player.getDistanceToEntity(entity) <= 6) {
 			float hurt = 0;
@@ -480,19 +481,6 @@ public class ItemLance extends ItemSword {
 		}
 	}
 	
-	private int getPlayerNumber(EntityClientPlayerMP player) {
-		Object[] obj = MinecraftServer.getServer().getEntityWorld().playerEntities.toArray();
-//		EntityPlayer[] players = (EntityPlayer[]) MinecraftServer.getServer().getEntityWorld().playerEntities.toArray();
-		for(int i = 0; i < obj.length; i++) {
-			if(obj[i] != null && (obj[i] instanceof EntityPlayer || obj[i] instanceof EntityPlayerMP)) {
-				if(((EntityPlayer) obj[i]).getCommandSenderName().equals(player.getCommandSenderName())) {
-				return i+1;
-				}
-			}
-		}
-		return 0;
-	}
-	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendID(Entity entity, EntityClientPlayerMP player)  {
 		this.sendID(entity.func_145782_y(), player);
@@ -500,13 +488,13 @@ public class ItemLance extends ItemSword {
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendID(int id, EntityClientPlayerMP player) {
-		if(this.getPlayerNumber(player) != 0) {
-			ByteBuf data = buffer(4);
-			data.writeInt(this.getPlayerNumber(player) - 1);
-			data.writeInt(id);
-			C17PacketCustomPayload packet = new C17PacketCustomPayload("lanceHitEntity", data);
-	        player.sendQueue.func_147297_a(packet);
-		}
+		ByteBuf data = buffer(4);
+		data.writeByte(0);
+		data.writeInt(0);
+		data.writeInt(player.func_145782_y());
+		data.writeInt(id);
+		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
+		player.sendQueue.func_147297_a(packet);
 		
 //		if(this.counter2 > 15) {
 //			this.counter2 = 0;
@@ -516,23 +504,27 @@ public class ItemLance extends ItemSword {
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
-		if(this.getPlayerNumber(player) != 0) {
-			ByteBuf data = buffer(4);
-			data.writeInt(this.getPlayerNumber(player) - 1);
-			data.writeFloat(hitValue);
-			C17PacketCustomPayload packet = new C17PacketCustomPayload("lanceHitValue", data);
-	        player.sendQueue.func_147297_a(packet);
-		}
+		ByteBuf data = buffer(4);
+		data.writeByte(0);
+		data.writeInt(1);
+		data.writeInt(player.func_145782_y());
+		data.writeFloat(hitValue);
+		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
+		player.sendQueue.func_147297_a(packet);
 		
 //		player.sendChatMessage("/send hit " + hitValue);
 	}
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendIsForwardKeyPressed(boolean isForwardKeyPressed, EntityClientPlayerMP player)  {
-		if(isForwardKeyPressed && this.getPlayerNumber(player) != 0) {
+//		Lance.packetPipeline.sendTo(new PacketHandler2(), player);
+		
+		if(isForwardKeyPressed) {
 			ByteBuf data = buffer(4);
-			data.writeInt(this.getPlayerNumber(player) - 1);
-			C17PacketCustomPayload packet = new C17PacketCustomPayload("lanceIsForward", data);
+			data.writeByte(0);
+			data.writeInt(2);
+			data.writeInt(player.func_145782_y());
+			C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
 	        player.sendQueue.func_147297_a(packet);
 		}
 		

@@ -86,7 +86,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Abstra
         }
 
         AbstractPacket pkt = clazz.newInstance();
-        pkt.decodeInto(ctx, payload.slice());
+        pkt.decodeInto(ctx, payload);
 
         EntityPlayer player;
         switch (FMLCommonHandler.instance().getEffectiveSide()) {
@@ -109,7 +109,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Abstra
 
     // Method to call from FMLInitializationEvent
     public void initalise() {
-        this.channels = NetworkRegistry.INSTANCE.newChannel("TUT", this);
+        this.channels = NetworkRegistry.INSTANCE.newChannel("lance", this);
     }
 
     // Method to call from FMLPostInitializationEvent
@@ -159,7 +159,7 @@ public class PacketPipeline extends MessageToMessageCodec<FMLProxyPacket, Abstra
      * @param message The message to send
      * @param player  The player to send it to
      */
-    public void sendTo(AbstractPacket message, EntityPlayerMP player) {
+    public void sendTo(AbstractPacket message, EntityPlayer player) {
         this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGET).set(FMLOutboundHandler.OutboundTarget.PLAYER);
         this.channels.get(Side.SERVER).attr(FMLOutboundHandler.FML_MESSAGETARGETARGS).set(player);
         this.channels.get(Side.SERVER).writeAndFlush(message);

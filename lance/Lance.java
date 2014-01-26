@@ -137,6 +137,7 @@ public class Lance {
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
 		packetPipeline.initalise();
+		packetPipeline.registerPacket(PacketHandler2.class);
 		
 //		NetworkRegistry.INSTANCE.newChannel("lanceHitEntity", new PacketHandler());
 //		NetworkRegistry.INSTANCE.newChannel("lanceHitValue", new PacketHandler());
