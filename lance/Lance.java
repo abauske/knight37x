@@ -36,26 +36,22 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "lance", name = "Lances Mod", version = "2.3.0.164")
-//@NetworkMod(clientSideRequired = true, serverSideRequired = false, channels = {"lance", "lanceHitEntity", "lanceHitValue", "lanceIsForward"}, packetHandler = PacketHandler.class)
+@Mod(modid = "lance", name = "Lances Mod", version = "2.4.0.172")
 public class Lance {
-//	public PacketHandler packetHandler;
 	
 	@Instance("lance")
 	public static Lance instance = new Lance();
-//	public GuiHandler guihandler = new GuiHandler();
 	
 	@SidedProxy(clientSide="knight37x.lance.proxies.LanceClientProxy", serverSide="knight37x.lance.proxies.LanceCommonProxy")
 	public static LanceCommonProxy proxy;
-//	public static LanceClientProxy cProxy = new LanceClientProxy();
 	
-	public static final PacketPipeline packetPipeline = new PacketPipeline();
+	public static final PacketHandler packetHandler = new PacketHandler();
 	
 	//-----------------------------------------------------------
 	// All Variables:
 	// Lances:
 
-	public static Item lanceOnIron = (Item) Item.field_150901_e.getObject("iron_lance_on");
+	public static Item lanceOnIron;
 	private int lanceOnIronID = 450;
 	
 	public static Item lanceUpIron;
@@ -92,7 +88,6 @@ public class Lance {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-//		this.packetHandler = new PacketHandler();
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		
@@ -123,10 +118,10 @@ public class Lance {
 		
 		// ---------------------------------------------------------------------------------------------------------------------------------
 		
-		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceiron");
-		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat);
-		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6);
-		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Diamond").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat);
+		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceiron").setTextureName("lance:lanceIron");
+		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceIron");
+		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setTextureName("lance:lanceDiamond");
+		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Diamond").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceDiamond");
 		
 		shaft = new ItemShaft().setCreativeTab(CreativeTabs.tabMaterials).setUnlocalizedName("shaft");
 		
@@ -136,31 +131,22 @@ public class Lance {
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-		packetPipeline.initalise();
-		packetPipeline.registerPacket(PacketHandler2.class);
-		
-//		NetworkRegistry.INSTANCE.newChannel("lanceHitEntity", new PacketHandler());
-//		NetworkRegistry.INSTANCE.newChannel("lanceHitValue", new PacketHandler());
-//		NetworkRegistry.INSTANCE.newChannel("lanceIsForward", new PacketHandler());
+		NetworkRegistry.INSTANCE.newChannel("lance", packetHandler);
 		
 		proxy.registerRenderers();
 	}
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
-		packetPipeline.postInitialise();
 		
 		if(this.isAvailable("ingotCopper")) {
-			lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4);
-			lanceUpCopper = new ItemLanceUp(Lance.lanceOnCopper, "Copper").setUnlocalizedName("lanceUpC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4);
+			lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
+			lanceUpCopper = new ItemLanceUp(Lance.lanceOnCopper, "Copper").setUnlocalizedName("lanceUpC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
 			
 			GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "ingotCopper"));
 			
 			GameRegistry.registerItem(lanceOnCopper, "lanceC");
 			GameRegistry.registerItem(lanceUpCopper, "lanceUpC");
-			
-			LanguageRegistry.addName(lanceOnCopper, "Copper Lance");
-			LanguageRegistry.addName(lanceUpCopper, "Copper Lance");
 
 			proxy.registerCopper();
 		}
@@ -168,36 +154,20 @@ public class Lance {
 		
 		
 		if(this.isAvailable("ingotSteel")) {
-			lanceOnSteel = new ItemLanceSteel().setUnlocalizedName("lanceS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2);
-			lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2);
+			lanceOnSteel = new ItemLanceSteel().setUnlocalizedName("lanceS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
+			lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 			
 			GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "ingotSteel"));
 			
 			GameRegistry.registerItem(lanceOnSteel, "lanceS");
 			GameRegistry.registerItem(lanceUpSteel, "lanceUpS");
-			
-			LanguageRegistry.addName(lanceOnSteel, "Steel Lance");
-			LanguageRegistry.addName(lanceUpSteel, "Steel Lance");
 
 			proxy.registerSteel();
 		}
 	}
 	
-	@EventHandler
-	public void serverLoad(FMLServerStartingEvent event) {
-	}
-	
-//	@EventHandler
-//	public void serverStart(FMLServerStartingEvent event){
-//		SendData file = new SendData();
-//		event.registerServerCommand(file);
-////		((CommandHandler) MinecraftServer.getServer().getCommandManager()).registerCommand(new SendData());
-//	}
-	
 	private void registerRecipes()
 	{
-//		CraftingManager.getInstance().addRecipe(new ItemStack(shaft, 3), "#  ", " # ", "  #", '#', Items.stick);
-//		GameRegistry.addRecipe(new ItemStack(shaft, 3), "#  ", " # ", "  #", '#', Items.stick);
 		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpIron, "  X", " # ", "#  ", '#', shaft, 'X', Items.iron_ingot));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpDia, "  X", " # ", "#  ", '#', shaft, 'X', Items.diamond));

@@ -32,6 +32,48 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
+		if(packet.channel().equals("lance")) {
+			try {
+				ByteBuf payload = packet.payload();
+				MinecraftServer server = MinecraftServer.getServer();
+				int flag = payload.readInt();
+				int playerID = payload.readInt();
+				Item item = null;
+				for(Object obj : server.getEntityWorld().playerEntities) {
+					if(obj instanceof EntityPlayer) {
+						EntityPlayer player = (EntityPlayer) obj;
+//						System.out.println(player.func_145782_y());
+						if(player.func_145782_y() == playerID) {
+							item = player.getCurrentEquippedItem().getItem();
+						}
+					}
+				}
+				
+				if(item instanceof ItemLance) {
+					ItemLance lance = (ItemLance) item;
+					
+					
+					if (flag == 0) {
+						lance.entity(payload.readInt(), null, server.getEntityWorld());
+						
+						
+					} else if (flag == 1) {
+						float value = payload.readFloat();
+						if (lance.hitValue < value || lance.hitTime < server.getSystemTimeMillis()) {
+							lance.hitValue = value;
+							lance.hitTime = server.getSystemTimeMillis() + 200;
+						}
+						
+						
+					} else if (flag == 2) {
+						lance.fwdTime = server.getSystemTimeMillis() + 200;
+					}
+				}
+		} catch(Exception e) {
+			System.out.println("problem");
+		}
+		}
+		
 //		MinecraftServer server = MinecraftServer.getServer();
 //		Item item = ((EntityPlayer) server.getEntityWorld().playerEntities.toArray()[packet.payload().readInt()]).getCurrentEquippedItem().getItem();
 //		

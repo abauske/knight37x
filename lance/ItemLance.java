@@ -97,12 +97,6 @@ public class ItemLance extends ItemSword {
 		setCreativeTab(null);
 	}
 	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IIconRegister reg) {
-		this.itemIcon = reg.registerIcon("lance:lance" + this.getMaterialString());
-	}
-	
 	public String getMaterialString() {
 		return "";
 	}
@@ -409,7 +403,6 @@ public class ItemLance extends ItemSword {
 		
 		if(this.hitTime >= MinecraftServer.getSystemTimeMillis()) {
 			hitUse = Math.abs(this.hitValue) * 4;
-			System.out.println(hitUse);
 		}
 		if(hitUse != 0 || player.getDistanceToEntity(entity) <= 6) {
 			float hurt = 0;
@@ -489,7 +482,6 @@ public class ItemLance extends ItemSword {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendID(int id, EntityClientPlayerMP player) {
 		ByteBuf data = buffer(4);
-		data.writeByte(0);
 		data.writeInt(0);
 		data.writeInt(player.func_145782_y());
 		data.writeInt(id);
@@ -505,7 +497,6 @@ public class ItemLance extends ItemSword {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
-		data.writeByte(0);
 		data.writeInt(1);
 		data.writeInt(player.func_145782_y());
 		data.writeFloat(hitValue);
@@ -521,7 +512,6 @@ public class ItemLance extends ItemSword {
 		
 		if(isForwardKeyPressed) {
 			ByteBuf data = buffer(4);
-			data.writeByte(0);
 			data.writeInt(2);
 			data.writeInt(player.func_145782_y());
 			C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
