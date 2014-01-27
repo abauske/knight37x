@@ -25,6 +25,8 @@ public class RenderLance implements IItemRenderer {
 	
 	public RenderLance(String location) {
 		this.texture = new ResourceLocation(location);
+
+		System.out.println(this.texture.toString());
 	}
 
 	public boolean handleRenderType(ItemStack var1, ItemRenderType type)
