@@ -60,8 +60,6 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 public class ItemLance extends ItemSword {
 
 	private int counter1 = 0;
-	private int counter2 = 0;
-	private int counter3 = 0;
 	
 	private EntityPlayer player;				//The player that has the lance in his inventory
 	private World world;						//Current world
@@ -210,16 +208,6 @@ public class ItemLance extends ItemSword {
 		if(this.counter1 > 9000) {
 			this.counter1 = 20;
 		}
-		
-		this.counter2++;
-		if(this.counter2 > 9000) {
-			this.counter2 = 20;
-		}
-		
-		this.counter3++;
-		if(this.counter3 > 9000) {
-			this.counter3 = 20;
-		}
 	}
     
     /*
@@ -241,12 +229,15 @@ public class ItemLance extends ItemSword {
     }
     
     public void damageLance(boolean attacked, Entity aim, EntityPlayer player) {
+    	if(counter1 < 20) {
+    		return ;
+    	}
+		this.counter1 = 0;
     	if (attacked && player.getCurrentEquippedItem() != null) {
 			this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
 		}
 		int armor = ((EntityLiving) aim).getTotalArmorValue();
-		if (attacked && Lance.shouldTakeDamageFromArmour && this.counter1 >= 10) {
-			this.counter1 = 0;
+		if (attacked && Lance.shouldTakeDamageFromArmour) {
 			if(armor > 0) {
 				this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + (int) ((100 / (11 - (armor / 2))) / 10) * Lance.armorBehaviour);
 			} else {

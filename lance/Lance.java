@@ -82,7 +82,7 @@ public class Lance {
 	public static boolean shouldLanceBreak = true;
 	private int numberOfHits = 500;
 	public static boolean shouldTakeDamageFromArmour = true;
-	public static int armorBehaviour = 20;
+	public static int armorBehaviour = 5;
 	
 	//-----------------------------------------------------------
 	
@@ -106,7 +106,7 @@ public class Lance {
 		shouldTakeDamageFromArmour = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take more damage when hitting an armoured mob?", true).getBoolean(true);
 		
 		numberOfHits = config.get(Configuration.CATEGORY_GENERAL, "How often you can hit a mob until the lance will break (Iron Lance)", 1500).getInt();
-		armorBehaviour = config.get(Configuration.CATEGORY_GENERAL, "Armour rating to instantly break a lance <settable to any value between 0 and 10 with increments of 0.5>", 5).getInt() * 2;
+		armorBehaviour = config.get(Configuration.CATEGORY_GENERAL, "Armour rating to instantly break a lance <settable to any value between 0 and 20 with increments of 0.5>", 5).getInt() * 2;
 		
 		if(armorBehaviour > 20) {
 			armorBehaviour = 20;
