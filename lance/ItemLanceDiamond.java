@@ -1,8 +1,17 @@
 package knight37x.lance;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import net.minecraft.enchantment.EnchantmentData;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 
 public class ItemLanceDiamond extends ItemLance {
@@ -24,5 +33,4 @@ public class ItemLanceDiamond extends ItemLance {
 	public Item getSwitch() {
 		return Lance.lanceUpDia;
 	}
-
 }

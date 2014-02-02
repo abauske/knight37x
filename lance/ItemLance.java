@@ -8,7 +8,10 @@ import static io.netty.buffer.Unpooled.buffer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -19,6 +22,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -27,12 +31,14 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IEntityMultiPart;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.boss.EntityDragonPart;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.monster.EntityCaveSpider;
+import net.minecraft.entity.monster.EntitySilverfish;
+import net.minecraft.entity.monster.EntitySpider;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntityWolf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -44,6 +50,7 @@ import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.stats.AchievementList;
 import net.minecraft.stats.StatList;
@@ -56,16 +63,17 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class ItemLance extends ItemSword {
 
-	private int counter1 = 0;
+//	private int counter1 = 0;
 	
 	private EntityPlayer player;				//The player that has the lance in his inventory
 	private World world;						//Current world
 	
 	private Entity pointedEntity;
-	private EntityLiving pointedEntityLiving;
+	private EntityLivingBase pointedEntityLiving;
 	private MovingObjectPosition objectMouseOver;
 	public float knockTime = 0.0F;
 	private boolean lastTickMouseButton0 = false;
@@ -96,18 +104,6 @@ public class ItemLance extends ItemSword {
 	public String getMaterialString() {
 		return "";
 	}
-	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void func_150895_a(Item item, CreativeTabs tab, List list) {
-		list.add(new ItemStack(item, 1, 0));
-	}
-	
-	@Override
-	public int getItemEnchantability() {
-		return 14;
-	}
 
 	@SideOnly(Side.CLIENT)
 
@@ -120,7 +116,7 @@ public class ItemLance extends ItemSword {
     }
 
 	@Override
-	public ItemStack onItemRightClick(ItemStack itemstack, World par2World, EntityPlayer par3EntityPlayer) {
+	public ItemStack onItemRightClick(ItemStack itemstack, World world, EntityPlayer par3EntityPlayer) {
 		if(this.getSwitch() != null) {
 			ItemStack newLance = new ItemStack(this.getSwitch(), 1);
 			EnchantmentHelper.setEnchantments(EnchantmentHelper.getEnchantments(itemstack), newLance);
@@ -204,10 +200,10 @@ public class ItemLance extends ItemSword {
 			this.leftClickCounter--;
 		}
 		
-		this.counter1++;
-		if(this.counter1 > 9000) {
-			this.counter1 = 20;
-		}
+//		this.counter1++;
+//		if(this.counter1 > 9000) {
+//			this.counter1 = 20;
+//		}
 	}
     
     /*
@@ -223,25 +219,24 @@ public class ItemLance extends ItemSword {
     	}
     	
     	Entity aim = this.getRightEntity(world, aimid);
-    	if (player != null && aim instanceof EntityLiving && player.getDistanceToEntity(aim) <= 12 && !aim.isDead) {
-			this.CalcAttack((EntityLiving) aim, player);
+    	if (player != null && aim instanceof EntityLivingBase && player.getDistanceToEntity(aim) <= 12 && !aim.isDead) {
+			this.CalcAttack((EntityLivingBase) aim, player);
 		}
     }
     
-    public void damageLance(boolean attacked, Entity aim, EntityPlayer player) {
-    	if(counter1 < 20) {
-    		return ;
-    	}
-		this.counter1 = 0;
-    	if (attacked && player.getCurrentEquippedItem() != null) {
-			this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
+    public void damageLance(Entity aim, EntityPlayer player) {
+//    	if(counter1 < 20) {
+//    		return ;
+//    	}
+//		this.counter1 = 0;
+    	ItemStack stack = player.getCurrentEquippedItem();
+    	if (stack != null) {
+			this.setDamage(stack, stack.getItemDamage() + 1);
 		}
-		int armor = ((EntityLiving) aim).getTotalArmorValue();
-		if (attacked && Lance.shouldTakeDamageFromArmour) {
+		int armor = ((EntityLivingBase) aim).getTotalArmorValue();
+		if (Lance.shouldTakeDamageFromArmour) {
 			if(armor > 0) {
-				this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + (int) ((100 / (11 - (armor / 2))) / 10) * Lance.armorBehaviour);
-			} else {
-				this.setDamage(player.getCurrentEquippedItem(), player.getCurrentEquippedItem().getItemDamage() + 1);
+				this.setDamage(stack, stack.getItemDamage() + (int) ((100 / (11 - (armor / 2))) / 10) * Lance.armorBehaviour);
 			}
 		}
     }
@@ -334,9 +329,9 @@ public class ItemLance extends ItemSword {
                 {
                     this.objectMouseOver = new MovingObjectPosition(this.pointedEntity);
 
-                    if (this.pointedEntity instanceof EntityLiving)
+                    if (this.pointedEntity instanceof EntityLivingBase)
                     {
-                        this.pointedEntityLiving = (EntityLiving)this.pointedEntity;
+                        this.pointedEntityLiving = (EntityLivingBase) this.pointedEntity;
                     }
                 }
             }
@@ -359,7 +354,7 @@ public class ItemLance extends ItemSword {
 		return true;
 	}
 	
-	private void knockBack(EntityLiving entity, EntityPlayer player) {
+	private void knockBack(EntityLivingBase entity, EntityPlayer player) {
 		int speed;
 		if(player.isSprinting()) {
 			speed = 10;
@@ -385,12 +380,10 @@ public class ItemLance extends ItemSword {
         }
 
         entity.attackedAtYaw = (float)(Math.atan2(d1, d0) * 180.0D / Math.PI) - entity.rotationYaw;
-        for(int i = 0; i < speed; i++) {
-        	entity.knockBack(player, speed, d0, d1);
-        }
+        entity.knockBack(player, speed, d0, d1);
 	}
 
-	private void CalcAttack(EntityLiving entity, EntityPlayer player) {
+	private void CalcAttack(EntityLivingBase entity, EntityPlayer player) {
 		boolean isForwardKeyPressed = false;
 		if(this.fwdTime >= Minecraft.getSystemTime()) {
 			isForwardKeyPressed = true;
@@ -408,8 +401,7 @@ public class ItemLance extends ItemSword {
 					hurt = 1F;
 					hurt *= 1.1;
 				} else if(ridingEntity != null) {
-					double speed = this.getSpeed((EntityLiving) ridingEntity);
-					System.out.println(speed);
+					double speed = this.getSpeed((EntityLivingBase) ridingEntity);
 					hurt += speed;
 				} else if(isForwardKeyPressed) {
 					hurt += 1F;
@@ -432,25 +424,64 @@ public class ItemLance extends ItemSword {
 			hurt *= this.getStrengh();
 			if(hurt != 0) {
 //				entity.attackEntityFrom(DamageSource.causePlayerDamage(player), hurt);
-				if(!player.capabilities.isCreativeMode && Lance.shouldLanceBreak) {
-					this.send(entity.func_145782_y(), hurt, (EntityClientPlayerMP) player, true);
-				} else {
-					this.send(entity.func_145782_y(), hurt, (EntityClientPlayerMP) player, false);
-				}
+				this.send(entity.func_145782_y(), hurt, (EntityClientPlayerMP) player);
 			}
 		}
 	}
 	
-	public void attack(EntityLiving entity, EntityPlayer player, float value) {
-		entity.attackEntityFrom(DamageSource.causePlayerDamage(player), value);
-//		this.knockBack(entity, player);
+	/*
+	 * Handles enchantments and returns extra damage caused by enchantments
+	 */
+	public static float handleEnchants(ItemStack itemstack, EntityLivingBase entity, EntityPlayer player)
+    {
+		float extraDamage = 0;
+		entity.setFire(EnchantmentHelper.getFireAspectModifier(player) * 4);
+		extraDamage += EnchantmentHelper.getEnchantmentModifierLiving(player, entity);
+		
+		int knockback = EnchantmentHelper.getKnockbackModifier(player, entity);
+		if(knockback != 0) {
+			double d0 = player.posX - entity.posX;
+	        double d1;
+
+	        for (d1 = player.posZ - entity.posZ; d0 * d0 + d1 * d1 < 1.0E-4D; d1 = (Math.random() - Math.random()) * 0.01D)
+	        {
+	            d0 = (Math.random() - Math.random()) * 0.01D;
+	        }
+
+	        entity.attackedAtYaw = (float)(Math.atan2(d1, d0) * 180.0D / Math.PI) - entity.rotationYaw;
+            float f1 = MathHelper.sqrt_double(d0 * d0 + d1 * d1);
+            float f2 = 0.3F * knockback;
+            entity.motionX /= 5.0D;
+            entity.motionY /= 5.0D;
+            entity.motionZ /= 5.0D;
+            entity.motionX -= d0 / (double)f1 * (double)f2;
+            entity.motionY += (double)f2;
+            entity.motionZ -= d1 / (double)f1 * (double)f2;
+
+            if (entity.motionY > 0.4000000059604645D)
+            {
+                entity.motionY = 0.4000000059604645D;
+            }
+		}
+//		print(Lance.isAvailable("diamond"));
+//		for(String current : OreDictionary.getOreNames())
+//		print(current);
+        return extraDamage;
+    }
+	
+	public static void print(Object object) {
+		System.out.println(object);
+	}
+	
+	public boolean attack(EntityLivingBase entity, EntityPlayer player, float value) {
+		return entity.attackEntityFrom(DamageSource.causePlayerDamage(player), value);
 	}
 	
 	public int getStrengh() {
 		return 0;
 	}
 	
- 	private double getSpeed(EntityLiving entity) {
+ 	private double getSpeed(EntityLivingBase entity) {
  		return entity.getDistance(entity.prevPosX, entity.prevPosY, entity.prevPosZ) * 35;
  	}
 
@@ -480,66 +511,14 @@ public class ItemLance extends ItemSword {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void send(int entityID, float hurt, EntityClientPlayerMP player, boolean takeDamage)  {
+	private void send(int entityID, float hurt, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
 		data.writeInt(player.func_145782_y());
 		data.writeInt(entityID);
 		data.writeFloat(hurt);
-		data.writeBoolean(takeDamage);
 		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
 		player.sendQueue.func_147297_a(packet);
 	}
-	
-	
-//	@SubscribeEvent(priority = EventPriority.NORMAL)
-//	private void sendID(Entity entity, EntityClientPlayerMP player)  {
-//		this.sendID(entity.func_145782_y(), player);
-//	}
-//	
-//	@SubscribeEvent(priority = EventPriority.NORMAL)
-//	private void sendID(int id, EntityClientPlayerMP player) {
-//		ByteBuf data = buffer(4);
-//		data.writeInt(0);
-//		data.writeInt(player.func_145782_y());
-//		data.writeInt(id);
-//		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-//		player.sendQueue.func_147297_a(packet);
-//		
-////		if(this.counter2 > 15) {
-////			this.counter2 = 0;
-////			player.sendChatMessage("/send entity " + id);
-////		}
-//	}
-//	
-//	@SubscribeEvent(priority = EventPriority.NORMAL)
-//	private void sendHitValue(float hitValue, EntityClientPlayerMP player)  {
-//		ByteBuf data = buffer(4);
-//		data.writeInt(1);
-//		data.writeInt(player.func_145782_y());
-//		data.writeFloat(hitValue);
-//		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-//		player.sendQueue.func_147297_a(packet);
-//		
-////		player.sendChatMessage("/send hit " + hitValue);
-//	}
-//	
-//	@SubscribeEvent(priority = EventPriority.NORMAL)
-//	private void sendIsForwardKeyPressed(boolean isForwardKeyPressed, EntityClientPlayerMP player)  {
-////		Lance.packetPipeline.sendTo(new PacketHandler2(), player);
-//		
-//		if(isForwardKeyPressed) {
-//			ByteBuf data = buffer(4);
-//			data.writeInt(2);
-//			data.writeInt(player.func_145782_y());
-//			C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-//	        player.sendQueue.func_147297_a(packet);
-//		}
-//		
-////		if(isForwardKeyPressed && this.counter3 > 15) {
-////			this.counter3 = 0;
-////			player.sendChatMessage("/send fwd " + isForwardKeyPressed);
-////		}
-//	}
 	
 	public boolean isRunningOnClient() {
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
@@ -551,5 +530,15 @@ public class ItemLance extends ItemSword {
                 // We are on the Bukkit server.
         	return false;
         }
+	}
+	
+	@Override
+	public boolean getIsRepairable(ItemStack stack1, ItemStack stack2) {
+		Item item1 = stack1.getItem();
+		Item item2 = stack2.getItem();
+		if(item1 == null && item2 == null) {
+			return false;
+		}
+		return (item1 instanceof ItemLance || item1 instanceof ItemLanceUp) && (item2 instanceof ItemLance || item2 instanceof ItemLanceUp);
 	}
 }

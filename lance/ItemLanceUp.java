@@ -15,22 +15,23 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.world.World;
 
-public class ItemLanceUp extends Item {
+public class ItemLanceUp extends ItemSword {
 
 	private final Item switchTo;
 	private final String material;
 	
 	public ItemLanceUp(Item switchTo, String material) {
+		super(ToolMaterial.IRON);
 		setCreativeTab(CreativeTabs.tabCombat);
 		this.switchTo = switchTo;
 		this.material = material;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IIconRegister reg) {
-		this.itemIcon = reg.registerIcon("Lance:lance" + this.material);
-	}
+//	@Override
+//	@SideOnly(Side.CLIENT)
+//	public void registerIcons(IIconRegister reg) {
+//		this.itemIcon = reg.registerIcon("Lance:lance" + this.material);
+//	}
 	
 	@SideOnly(Side.CLIENT)
 
@@ -45,15 +46,9 @@ public class ItemLanceUp extends Item {
 	/**
      * returns the action that specifies what animation to play when the items is being used
      */
-    public EnumAction getItemUseAction(ItemStack par1ItemStack)
-    {
+    public EnumAction getItemUseAction(ItemStack par1ItemStack) {
         return EnumAction.none;
     }
-	
-	@Override
-	public int getItemEnchantability() {
-		return 14;
-	}
 
     @Override
 	public ItemStack onItemRightClick(ItemStack itemstack, World par2World, EntityPlayer par3EntityPlayer) {
@@ -80,4 +75,20 @@ public class ItemLanceUp extends Item {
 	public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
 		return true;
 	}
+
+	@Override
+	public boolean getIsRepairable(ItemStack stack1, ItemStack stack2) {
+		Item item1 = stack1.getItem();
+		Item item2 = stack2.getItem();
+		if(item1 == null && item2 == null) {
+			return false;
+		}
+		return (item1 instanceof ItemLance || item1 instanceof ItemLanceUp) && (item2 instanceof ItemLance || item2 instanceof ItemLanceUp);
+	}
+	
+	@Override
+	public float func_150931_i() {
+        return 1F;
+    }
+	
 }

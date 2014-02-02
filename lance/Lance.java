@@ -1,6 +1,7 @@
 package knight37x.lance;
 
 import java.util.Locale.Category;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.FolderResourcePack;
@@ -10,6 +11,7 @@ import net.minecraft.command.ServerCommandManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
+import net.minecraft.item.Item.ToolMaterial;
 import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
@@ -36,7 +38,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "lance", name = "Lances Mod", version = "2.4.0.172")
+@Mod(modid = "lance", name = "Lance Mod", version = "2.4.2.172")
 public class Lance {
 	
 	@Instance("lance")
@@ -118,72 +120,66 @@ public class Lance {
 		
 		// ---------------------------------------------------------------------------------------------------------------------------------
 		
-		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceiron").setTextureName("lance:lanceIron");
+		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceIron");
 		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceIron");
 		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setTextureName("lance:lanceDiamond");
 		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Diamond").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceDiamond");
 		
 		shaft = new ItemShaft().setCreativeTab(CreativeTabs.tabMaterials).setUnlocalizedName("shaft");
 		
+		//Copper
+		lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
+		lanceUpCopper = new ItemLanceUp(Lance.lanceOnCopper, "Copper").setUnlocalizedName("lanceUpC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
+		
+		//Steel
+		lanceOnSteel = new ItemLanceSteel().setUnlocalizedName("lanceS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
+		lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
+		
+		
+		
 		registerItems();
-		registerRecipes();
 	}
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandler);
-		
+
+		registerRecipes();
 		proxy.registerRenderers();
 	}
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		
-		if(this.isAvailable("ingotCopper")) {
-			lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
-			lanceUpCopper = new ItemLanceUp(Lance.lanceOnCopper, "Copper").setUnlocalizedName("lanceUpC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
-			
-			GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "ingotCopper"));
-			
-			GameRegistry.registerItem(lanceOnCopper, "lanceC");
-			GameRegistry.registerItem(lanceUpCopper, "lanceUpC");
-
-			proxy.registerCopper();
-		}
-		
-		
-		
-		if(this.isAvailable("ingotSteel")) {
-			lanceOnSteel = new ItemLanceSteel().setUnlocalizedName("lanceS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
-			lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
-			
-			GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "ingotSteel"));
-			
-			GameRegistry.registerItem(lanceOnSteel, "lanceS");
-			GameRegistry.registerItem(lanceUpSteel, "lanceUpS");
-
-			proxy.registerSteel();
-		}
 	}
 	
 	private void registerRecipes()
 	{
 		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpIron, "  X", " # ", "#  ", '#', shaft, 'X', Items.iron_ingot));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpDia, "  X", " # ", "#  ", '#', shaft, 'X', Items.diamond));
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpIron, "  X", " # ", "#  ", '#', shaft, 'X', Items.iron_ingot));
+		
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "ingot_Steel"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "ingot_Copper"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "steel_ingot"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "copper_ingot"));
 	}
 	
 	private void registerItems()
 	{
 		GameRegistry.registerItem(lanceOnIron, "iron_lance_on");
-		GameRegistry.registerItem(lanceUpIron, "iron_lance_up");
+		GameRegistry.registerItem(lanceUpIron, "iron_lance");
 		GameRegistry.registerItem(lanceOnDia, "diamond_lance_on");
-		GameRegistry.registerItem(lanceUpDia, "diamon_lance_up");
+		GameRegistry.registerItem(lanceUpDia, "diamon_lance");
+		GameRegistry.registerItem(lanceOnSteel, "steel_lance_on");
+		GameRegistry.registerItem(lanceUpSteel, "steel_lance");
+		GameRegistry.registerItem(lanceOnCopper, "copper_lance_on");
+		GameRegistry.registerItem(lanceUpCopper, "copper_lance");
 		
 		GameRegistry.registerItem(shaft, "shaft");
 	}
 	
-	private boolean isAvailable(String item) {
+	public static boolean isAvailable(String item) {
 		String[] names = OreDictionary.getOreNames();
 		for(int i = 0; i < names.length; i++) {
 			if(names[i].equals(item)) {

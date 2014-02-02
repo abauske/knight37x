@@ -3,7 +3,10 @@ package knight37x.lance;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -19,14 +22,12 @@ import org.lwjgl.opengl.GL11;
 public class RenderLance implements IItemRenderer {
 	
 	protected ModelLanceUp model = new ModelLanceUp();
-	private ResourceLocation texture = new ResourceLocation("textures/models/modelLanceUpIron.png");
+	private static ResourceLocation texture = new ResourceLocation("textures/models/modelLanceUpIron.png");
 	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
 	private float knockTime = 0.0F;
 	
 	public RenderLance(String location) {
 		this.texture = new ResourceLocation(location);
-
-		System.out.println(this.texture.toString());
 	}
 
 	public boolean handleRenderType(ItemStack var1, ItemRenderType type)

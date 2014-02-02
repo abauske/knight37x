@@ -6,12 +6,4 @@ public class LanceCommonProxy {
     public void registerRenderers() {
         // Nothing here as the server doesn't render graphics or entities!
     }
-    
-    public void registerCopper() {
-    	// Nothing here as the server doesn't render graphics or entities!
-    }
-    
-    public void registerSteel() {
-    	// Nothing here as the server doesn't render graphics or entities!
-    }
 }
