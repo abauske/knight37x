@@ -15,7 +15,6 @@ public class LanceClientProxy extends LanceCommonProxy {
 	
 	@Override
 	public void registerRenderers() {
-//		MinecraftForgeClient.registerItemRenderer(Lance.lance1 , (IItemRenderer) new RenderLance());
 		MinecraftForgeClient.registerItemRenderer(Lance.lanceOnIron, (IItemRenderer) new RenderLance("textures/models/modelLanceUpIron.png"));
 		MinecraftForgeClient.registerItemRenderer(Lance.lanceUpIron, (IItemRenderer) new RenderLanceUp("textures/models/modelLanceUpIron.png"));
 		MinecraftForgeClient.registerItemRenderer(Lance.lanceOnDia, (IItemRenderer) new RenderLance("textures/models/modelLanceUpDia.png"));
