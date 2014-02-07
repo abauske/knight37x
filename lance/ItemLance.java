@@ -393,7 +393,7 @@ public class ItemLance extends ItemSword {
 		if(this.hitTime >= Minecraft.getSystemTime()) {
 			hitUse = Math.abs(this.hitValue) * 4;
 		}
-		if((hitUse != 0 || player.getDistanceToEntity(entity) <= 6) && isForwardKeyPressed) {
+		if(hitUse != 0 || (player.getDistanceToEntity(entity) <= 6 && isForwardKeyPressed)) {
 			float hurt = 0;
 			if(player.isRiding()) {
 				Entity ridingEntity = player.ridingEntity;
