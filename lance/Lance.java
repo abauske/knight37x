@@ -4,11 +4,14 @@ import java.util.Locale.Category;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.RenderArrow;
+import net.minecraft.client.renderer.entity.RenderSnowball;
 import net.minecraft.client.resources.FolderResourcePack;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ServerCommandManager;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
@@ -22,6 +25,7 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import knight37x.lance.proxies.LanceClientProxy;
 import knight37x.lance.proxies.LanceCommonProxy;
+import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -38,7 +42,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "lance", name = "Lance Mod", version = "2.4.2.172")
+@Mod(modid = "lance", name = "Lance Mod", version = "2.4.3.172")
 public class Lance {
 	
 	@Instance("lance")
@@ -79,6 +83,10 @@ public class Lance {
 	
 	public static Item shaft;
 	private int shaftID = 460;
+	
+	// Spears:
+	
+	public static Item spear;
 	
 	//Other Configurations:
 	public static boolean shouldLanceBreak = true;
@@ -136,6 +144,9 @@ public class Lance {
 		lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 		
 		
+		//Spear
+		spear = new Spear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceIron");
+		
 		
 		registerItems();
 	}
@@ -143,6 +154,9 @@ public class Lance {
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandler);
+//		EntityRegistry.registerModEntity(EntityArrow.class, "spear", 0, this, 100, 20, true);
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new SpearRenderer());
+//		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSnowball(this.spear));
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -177,6 +191,8 @@ public class Lance {
 		GameRegistry.registerItem(lanceUpCopper, "copper_lance");
 		
 		GameRegistry.registerItem(shaft, "shaft");
+		
+		GameRegistry.registerItem(spear, "spear");
 	}
 	
 	public static boolean isAvailable(String item) {
