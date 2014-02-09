@@ -16,7 +16,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
 
-public class SpearRenderer extends RenderArrow{
+public class RenderSpearEntity extends RenderArrow {
 
 	private static final ResourceLocation arrowTextures = new ResourceLocation("lance:textures/entity/spear.png");
 	
@@ -50,7 +50,7 @@ public class SpearRenderer extends RenderArrow{
         }
 
         GL11.glRotatef(45.0F, 1.0F, 0.0F, 0.0F);
-        GL11.glScalef(f10, f10, f10);
+        GL11.glScalef(f10, f10 / 2, f10 / 2);
         GL11.glTranslatef(-4.0F, 0.0F, 0.0F);
         GL11.glNormal3f(f10, 0.0F, 0.0F);
         tessellator.startDrawingQuads();
@@ -66,7 +66,7 @@ public class SpearRenderer extends RenderArrow{
         tessellator.addVertexWithUV(-7.0D, -2.0D, 2.0D, (double)f7, (double)f9);
         tessellator.addVertexWithUV(-7.0D, -2.0D, -2.0D, (double)f6, (double)f9);
         tessellator.draw();
-
+ 
         for (int i = 0; i < 4; ++i)
         {
             GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);

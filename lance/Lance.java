@@ -51,7 +51,8 @@ public class Lance {
 	@SidedProxy(clientSide="knight37x.lance.proxies.LanceClientProxy", serverSide="knight37x.lance.proxies.LanceCommonProxy")
 	public static LanceCommonProxy proxy;
 	
-	public static final PacketHandler packetHandler = new PacketHandler();
+	public static final PacketHandlerLance packetHandlerLance = new PacketHandlerLance();
+	public static final PacketHandlerSpear packetHandlerSpear = new PacketHandlerSpear();
 	
 	//-----------------------------------------------------------
 	// All Variables:
@@ -145,7 +146,7 @@ public class Lance {
 		
 		
 		//Spear
-		spear = new Spear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceIron");
+		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
 		
 		
 		registerItems();
@@ -153,9 +154,10 @@ public class Lance {
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-		NetworkRegistry.INSTANCE.newChannel("lance", packetHandler);
-//		EntityRegistry.registerModEntity(EntityArrow.class, "spear", 0, this, 100, 20, true);
-		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new SpearRenderer());
+		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
+		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
+		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSpearEntity());
 //		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSnowball(this.spear));
 
 		registerRecipes();

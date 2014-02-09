@@ -10,7 +10,8 @@ import knight37x.lance.EntitySpear;
 import knight37x.lance.Lance;
 import knight37x.lance.RenderLance;
 import knight37x.lance.RenderLanceUp;
-import knight37x.lance.SpearRenderer;
+import knight37x.lance.RenderSpear;
+import knight37x.lance.RenderSpearEntity;
 import knight37x.lance.proxies.*;
 
 public class LanceClientProxy extends LanceCommonProxy {
@@ -26,6 +27,6 @@ public class LanceClientProxy extends LanceCommonProxy {
 		MinecraftForgeClient.registerItemRenderer(Lance.lanceOnSteel, (IItemRenderer) new RenderLance("textures/models/modelLanceUpSteel.png"));
 		MinecraftForgeClient.registerItemRenderer(Lance.lanceUpSteel, (IItemRenderer) new RenderLanceUp("textures/models/modelLanceUpSteel.png"));
 		
-//		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new SpearRenderer());
+		MinecraftForgeClient.registerItemRenderer(Lance.spear, (IItemRenderer) new RenderSpear());
     }
 }

@@ -1,120 +1,3 @@
-//package knight37x.lance;
-//
-//import java.util.Random;
-//
-//import net.minecraft.entity.Entity;
-//import net.minecraft.entity.EntityLivingBase;
-//import net.minecraft.entity.monster.EntityBlaze;
-//import net.minecraft.entity.player.EntityPlayer;
-//import net.minecraft.entity.projectile.EntityArrow;
-//import net.minecraft.entity.projectile.EntitySnowball;
-//import net.minecraft.entity.projectile.EntityThrowable;
-//import net.minecraft.item.ItemStack;
-//import net.minecraft.util.DamageSource;
-//import net.minecraft.util.MathHelper;
-//import net.minecraft.util.MovingObjectPosition;
-//import net.minecraft.world.World;
-//
-//public class EntitySpear extends EntityArrow {
-//	
-////	private float stickPitch = 0;
-////	private float stickYaw = 0;
-////	
-////	private int canBePickedUp = 0;
-//
-//	public EntitySpear(World world) {
-//		super(world);
-//	}
-//	
-//	public EntitySpear(World world, double par2, double par4, double par6) {
-//		super(world, par2, par4, par6);
-//    }
-//	
-//	public EntitySpear(World world, EntityLivingBase entity1, EntityLivingBase entity2, float par4, float par5) {
-//		super(world, entity1, entity2, par4, par5);
-//    }
-//	
-//	public EntitySpear(World world, EntityLivingBase entity, float par3) {
-//		super(world, entity, par3);
-//    }
-//	
-//	
-//	
-////	public EntitySpear(World world) {
-////		super(world);
-////    }
-////	
-////	public EntitySpear(World world, double par2, double par4, double par6) {
-////		super(world, par2, par4, par6);
-////    }
-////	
-////	public EntitySpear(World world, EntityLivingBase entity) {
-////		super(world, entity);
-////		if(entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode) {
-////			this.canBePickedUp = 1;
-////		}
-////    }
-////	
-////	@Override
-////    protected void onImpact(MovingObjectPosition par1MovingObjectPosition)
-////    {
-////        if (par1MovingObjectPosition.entityHit != null)
-////        {
-////            byte b0 = 0;
-////
-////            if (par1MovingObjectPosition.entityHit instanceof EntityBlaze)
-////            {
-////                b0 = 3;
-////            }
-////
-////            par1MovingObjectPosition.entityHit.attackEntityFrom(DamageSource.causeThrownDamage(this, this.getThrower()), (float)3);
-////        }
-////
-//////        for (int i = 0; i < 8; ++i)
-//////        {
-//////            this.worldObj.spawnParticle("snowballpoof", this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
-//////        }
-////        
-////        this.motionX = 0;
-////        this.motionY = 0;
-////        this.motionZ = 0;
-////        
-////        if(this.stickPitch == 0) {
-////            this.stickPitch = this.rotationPitch;
-////        }
-////        this.rotationPitch = this.stickPitch;
-////
-////        if(this.stickYaw == 0) {
-////            this.stickYaw = this.rotationYaw;
-////        }
-////        this.rotationYaw = this.stickYaw;
-////        
-////        if(this.canBePickedUp <= 1) {
-////        	for(int i = 0; i < this.worldObj.playerEntities.size(); i++) {
-////            	EntityPlayer current = (EntityPlayer) this.worldObj.playerEntities.get(i);
-////            	if(this.worldObj.isRemote ? this.getDistanceToEntity(current) <= 2 : this.getDistanceToEntity(current) <= 1F) {
-////            		this.worldObj.playSoundAtEntity(this, "random.pop", 1F, 0.4F / (new Random().nextFloat() * 0.4F + 0.8F));
-////            		if(this.worldObj.isRemote && this.canBePickedUp == 0 && !current.inventory.addItemStackToInventory(new ItemStack(Lance.spear))) {
-////            			current.dropPlayerItemWithRandomChoice(new ItemStack(Lance.spear), true);
-////            		}
-////            		this.setDead();
-////            		return ;
-////            	}
-////            }
-////        }
-//
-////        if (!this.worldObj.isRemote)
-////        {
-////            this.setDead();
-////        }
-////    }
-//	
-//	public int canBePickedUp() {
-//		return this.canBePickedUp;
-//	}
-//}
-
-
 package knight37x.lance;
 
 import cpw.mods.fml.relauncher.Side;
@@ -126,15 +9,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
@@ -143,8 +30,31 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
+//public class EntitySpear extends EntityArrow {
+//
+//	public EntitySpear(World world) {
+//		super(world);
+//	}
+//	
+//	public EntitySpear(World world, double par2, double par4, double par6) {
+//		super(world, par2, par4, par6);
+//	}
+//	
+//	public EntitySpear(World world, EntityLivingBase entity1, EntityLivingBase entity2, float par4, float par5) {
+//		super(world, entity1, entity2, par4, par5);
+//	}
+//	
+//	public EntitySpear(World world, EntityLivingBase entity, float par3) {
+//		super(world, entity, par3);
+//	}
+//	
+//}
+
 public class EntitySpear extends Entity implements IProjectile
 {
+	private boolean reload = false;
+	private int reloadCounter = 0;
+	
     private int x = -1;
     private int y = -1;
     private int z = -1;
@@ -238,7 +148,8 @@ public class EntitySpear extends Entity implements IProjectile
         this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI));
         this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI));
         this.motionY = (double)(-MathHelper.sin(this.rotationPitch / 180.0F * (float)Math.PI));
-        this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, 2.5F, 1.0F);
+        this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, par3, 1.0F);
+        this.damage = par3;
     }
 
     protected void entityInit()
@@ -339,7 +250,7 @@ public class EntitySpear extends Entity implements IProjectile
         {
             int j = this.worldObj.getBlockMetadata(this.x, this.y, this.z);
 
-            if (block == this.block && j == this.inData)
+            if (block == this.block && j == this.inData && this.canBePickedUp != 1)
             {
                 ++this.ticksInGround;
 
@@ -586,6 +497,7 @@ public class EntitySpear extends Entity implements IProjectile
         }
     }
 
+    @Override
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
@@ -603,11 +515,13 @@ public class EntitySpear extends Entity implements IProjectile
         par1NBTTagCompound.setDouble("damage", this.damage);
     }
 
+    @Override
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
     public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
     {
+    	this.reload = true;
         this.x = par1NBTTagCompound.getShort("xTile");
         this.y = par1NBTTagCompound.getShort("yTile");
         this.z = par1NBTTagCompound.getShort("zTile");
@@ -637,6 +551,7 @@ public class EntitySpear extends Entity implements IProjectile
      */
     public void onCollideWithPlayer(EntityPlayer par1EntityPlayer)
     {
+        boolean test = StaticMethods.isRunningOnClient();
         if (this.inGround && this.arrowShake <= 0)
         {
             boolean flag = this.canBePickedUp == 1 || this.canBePickedUp == 2 && par1EntityPlayer.capabilities.isCreativeMode;

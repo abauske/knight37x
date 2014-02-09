@@ -21,11 +21,11 @@ import cpw.mods.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 
 @Sharable
-public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
+public class PacketHandlerSpear extends SimpleChannelInboundHandler<FMLProxyPacket> {
 	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
-		if(packet.channel().equals("lance")) {
+		if(packet.channel().equals("spear")) {
 			try {
 				ByteBuf payload = packet.payload();
 				MinecraftServer server = MinecraftServer.getServer();
@@ -35,16 +35,10 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				if(stack != null) {
 					item = stack.getItem();
 				}
-
-				Entity entity = ItemLance.getRightEntity(server.getEntityWorld(), payload.readInt());
-				if(item instanceof ItemLance && player != null && entity != null) {
-					ItemLance lance = (ItemLance) item;
+				if(item instanceof ItemSpear && player != null) {
+					ItemSpear spear = (ItemSpear) item;
 					
-					if(lance.attack((EntityLivingBase) entity, player, payload.readFloat() + lance.handleEnchants(stack, (EntityLivingBase) entity, player)) && !player.capabilities.isCreativeMode && Lance.shouldLanceBreak) {
-						if(Math.random() < 1.0f / (EnchantmentHelper.getEnchantmentLevel(34, stack) + 1)) {
-							lance.damageLance(entity, player);
-						}
-					}
+					spear.throwSpear(player, server.getEntityWorld());
 					
 				}
 			} catch(Exception e) {

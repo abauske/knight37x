@@ -146,7 +146,7 @@ public class ItemLance extends ItemSword {
 		if(entity != null && entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			this.player = player;
-			if(this.isRunningOnClient()) {
+			if(StaticMethods.isRunningOnClient()) {
 				if(Minecraft.getMinecraft().gameSettings.keyBindForward.func_151470_d()) {
 					this.fwdTime = Minecraft.getSystemTime() + 200;
 //					this.sendIsForwardKeyPressed(true, (EntityClientPlayerMP) player);
@@ -183,7 +183,7 @@ public class ItemLance extends ItemSword {
 			
 			
 			if(player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemLance) {
-				if (this.isRunningOnClient() && this.getMouseOver() != null) {
+				if (StaticMethods.isRunningOnClient() && this.getMouseOver() != null) {
 					Entity aim = this.getMouseOver();
 					this.entity(aim.func_145782_y(), player, world);
 //					this.sendID(aim.func_145782_y(), (EntityClientPlayerMP) player);
@@ -518,18 +518,6 @@ public class ItemLance extends ItemSword {
 		data.writeFloat(hurt);
 		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
 		player.sendQueue.func_147297_a(packet);
-	}
-	
-	public boolean isRunningOnClient() {
-		Side side = FMLCommonHandler.instance().getEffectiveSide();
-        if (side == Side.SERVER) {
-            return false;
-        } else if (side == Side.CLIENT) {
-            return true;
-        } else {
-                // We are on the Bukkit server.
-        	return false;
-        }
 	}
 	
 	@Override
