@@ -157,7 +157,6 @@ public class Lance {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
 		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
-		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSpearEntity());
 //		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSnowball(this.spear));
 
 		registerRecipes();
@@ -179,6 +178,8 @@ public class Lance {
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "ingot_Copper"));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "steel_ingot"));
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "copper_ingot"));
+		
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(spear, 4), "  X", " # ", "#  ", '#', Items.stick, 'X', Items.iron_ingot));
 	}
 	
 	private void registerItems()

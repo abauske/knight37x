@@ -52,6 +52,7 @@ import net.minecraft.world.World;
 
 public class EntitySpear extends Entity implements IProjectile
 {
+	public boolean hashit = true;
 	private boolean reload = false;
 	private int reloadCounter = 0;
 	
@@ -84,6 +85,7 @@ public class EntitySpear extends Entity implements IProjectile
     public EntitySpear(World par1World)
     {
         super(par1World);
+        this.hashit = false;
         this.renderDistanceWeight = 10.0D;
         this.setSize(0.5F, 0.5F);
     }
@@ -91,6 +93,7 @@ public class EntitySpear extends Entity implements IProjectile
     public EntitySpear(World par1World, double par2, double par4, double par6)
     {
         super(par1World);
+        this.hashit = false;
         this.renderDistanceWeight = 10.0D;
         this.setSize(0.5F, 0.5F);
         this.setPosition(par2, par4, par6);
@@ -100,6 +103,7 @@ public class EntitySpear extends Entity implements IProjectile
     public EntitySpear(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase par3EntityLivingBase, float par4, float par5)
     {
         super(par1World);
+        this.hashit = false;
         this.renderDistanceWeight = 10.0D;
         this.shootingEntity = par2EntityLivingBase;
 
@@ -130,6 +134,7 @@ public class EntitySpear extends Entity implements IProjectile
     public EntitySpear(World par1World, EntityLivingBase par2EntityLivingBase, float par3)
     {
         super(par1World);
+        this.hashit = false;
         this.renderDistanceWeight = 10.0D;
         this.shootingEntity = par2EntityLivingBase;
 
@@ -220,7 +225,7 @@ public class EntitySpear extends Entity implements IProjectile
     public void onUpdate()
     {
         super.onUpdate();
-
+//this.setDead();
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
         {
             float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
@@ -250,14 +255,23 @@ public class EntitySpear extends Entity implements IProjectile
         {
             int j = this.worldObj.getBlockMetadata(this.x, this.y, this.z);
 
-            if (block == this.block && j == this.inData && this.canBePickedUp != 1)
+            if (block == this.block && j == this.inData)
             {
-                ++this.ticksInGround;
+            	if(this.canBePickedUp != 1) {
+                    ++this.ticksInGround;
 
-                if (this.ticksInGround == 12000)
-                {
-                    this.setDead();
-                }
+                    if (this.ticksInGround == 1200)
+                    {
+                        this.setDead();
+                    }
+            	} else {
+            		++this.ticksInGround;
+
+                    if (this.ticksInGround == 24000)
+                    {
+                        this.setDead();
+                    }
+            	}
             }
             else
             {
@@ -354,57 +368,60 @@ public class EntitySpear extends Entity implements IProjectile
                         movingobjectposition.entityHit.setFire(5);
                     }
 
-                    if (movingobjectposition.entityHit.attackEntityFrom(damagesource, (float)k))
-                    {
-                        if (movingobjectposition.entityHit instanceof EntityLivingBase)
+                    if(!this.hashit) {
+                        if (movingobjectposition.entityHit.attackEntityFrom(damagesource, (float)k))
                         {
-                            EntityLivingBase entitylivingbase = (EntityLivingBase)movingobjectposition.entityHit;
-
-                            if (!this.worldObj.isRemote)
+                        	this.hashit = true;
+                            if (movingobjectposition.entityHit instanceof EntityLivingBase)
                             {
-                                entitylivingbase.setArrowCountInEntity(entitylivingbase.getArrowCountInEntity() + 1);
-                            }
+                                EntityLivingBase entitylivingbase = (EntityLivingBase)movingobjectposition.entityHit;
 
-                            if (this.knockbackStrength > 0)
-                            {
-                                f4 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
-
-                                if (f4 > 0.0F)
+                                if (!this.worldObj.isRemote)
                                 {
-                                    movingobjectposition.entityHit.addVelocity(this.motionX * (double)this.knockbackStrength * 0.6000000238418579D / (double)f4, 0.1D, this.motionZ * (double)this.knockbackStrength * 0.6000000238418579D / (double)f4);
+                                    entitylivingbase.setArrowCountInEntity(entitylivingbase.getArrowCountInEntity() + 1);
+                                }
+
+                                if (this.knockbackStrength > 0)
+                                {
+                                    f4 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+
+                                    if (f4 > 0.0F)
+                                    {
+                                        movingobjectposition.entityHit.addVelocity(this.motionX * (double)this.knockbackStrength * 0.6000000238418579D / (double)f4, 0.1D, this.motionZ * (double)this.knockbackStrength * 0.6000000238418579D / (double)f4);
+                                    }
+                                }
+
+                                if (this.shootingEntity != null && this.shootingEntity instanceof EntityLivingBase)
+                                {
+                                    EnchantmentHelper.func_151384_a(entitylivingbase, this.shootingEntity);
+                                    EnchantmentHelper.func_151385_b((EntityLivingBase)this.shootingEntity, entitylivingbase);
+                                }
+
+                                if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity && movingobjectposition.entityHit instanceof EntityPlayer && this.shootingEntity instanceof EntityPlayerMP)
+                                {
+                                    ((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.func_147359_a(new S2BPacketChangeGameState(6, 0.0F));
                                 }
                             }
 
-                            if (this.shootingEntity != null && this.shootingEntity instanceof EntityLivingBase)
-                            {
-                                EnchantmentHelper.func_151384_a(entitylivingbase, this.shootingEntity);
-                                EnchantmentHelper.func_151385_b((EntityLivingBase)this.shootingEntity, entitylivingbase);
-                            }
+                            this.playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
 
-                            if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity && movingobjectposition.entityHit instanceof EntityPlayer && this.shootingEntity instanceof EntityPlayerMP)
+                            if (!(movingobjectposition.entityHit instanceof EntityEnderman) && this.canBePickedUp != 1)
                             {
-                                ((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.func_147359_a(new S2BPacketChangeGameState(6, 0.0F));
+                                this.setDead();
                             }
                         }
-
-                        this.playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
-
-                        if (!(movingobjectposition.entityHit instanceof EntityEnderman))
+                        else
                         {
-                            this.setDead();
+                        	if(this.worldObj.isRemote && this.canBePickedUp != 1) {
+                        		this.setDead();
+                        	}
+                            this.motionX *= -0.10000000149011612D;
+                            this.motionY *= -0.10000000149011612D;
+                            this.motionZ *= -0.10000000149011612D;
+                            this.rotationYaw += 180.0F;
+                            this.prevRotationYaw += 180.0F;
+                            this.ticksInAir = 0;
                         }
-                    }
-                    else
-                    {
-                    	if(this.worldObj.isRemote) {
-                    		this.setDead();
-                    	}
-                        this.motionX *= -0.10000000149011612D;
-                        this.motionY *= -0.10000000149011612D;
-                        this.motionZ *= -0.10000000149011612D;
-                        this.rotationYaw += 180.0F;
-                        this.prevRotationYaw += 180.0F;
-                        this.ticksInAir = 0;
                     }
                 }
                 else
@@ -440,7 +457,8 @@ public class EntitySpear extends Entity implements IProjectile
                     this.worldObj.spawnParticle("crit", this.posX + this.motionX * (double)i / 4.0D, this.posY + this.motionY * (double)i / 4.0D, this.posZ + this.motionZ * (double)i / 4.0D, -this.motionX, -this.motionY + 0.2D, -this.motionZ);
                 }
             }
-
+            
+            
             this.posX += this.motionX;
             this.posY += this.motionY;
             this.posZ += this.motionZ;

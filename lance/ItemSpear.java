@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.entity.Entity;
@@ -18,6 +19,7 @@ import net.minecraft.item.ItemSnowball;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 public class ItemSpear extends ItemSword {
@@ -61,21 +63,35 @@ public class ItemSpear extends ItemSword {
 		if(entity != null && entity instanceof EntityPlayer) {
 			EntityPlayer player = (EntityPlayer) entity;
 			Item spear = player.getCurrentEquippedItem() != null ? player.getCurrentEquippedItem().getItem() : null;
-			if(StaticMethods.isRunningOnClient() && spear != null && spear == this) {
-				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindUseItem.func_151470_d();
-				if(isButton0Down && this.thrust < 2.5F) {
-					this.thrust += 0.1F;
-				} else if(!isButton0Down && this.lastTickMouseButton0) {
-					this.thrustValue = Math.abs(this.thrust);
-					this.thrust = 0;
-					if(this.tryThrowSpear(player, world)) {
-						this.send(thrustValue, (EntityClientPlayerMP) player);
+			if(StaticMethods.isRunningOnClient()) {
+				boolean flag = true;
+				MovingObjectPosition mov = Minecraft.getMinecraft().objectMouseOver;
+				if(mov.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+					Block block = world.func_147439_a(mov.blockX, mov.blockY, mov.blockZ);
+					if(block.func_149727_a(world, mov.blockX, mov.blockY, mov.blockZ, player, 0, 0, 0, 0)) {
+						flag = false;
 					}
 				}
-				if(this.thrust > 2.5F) {
-					this.thrust = 2.5F;
+				if(spear != null && spear == this && flag) {
+					boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindUseItem.func_151470_d();
+					if(isButton0Down && this.thrust < 2.5F) {
+						this.thrust += 0.1F;
+					} else if(!isButton0Down && this.lastTickMouseButton0) {
+						this.thrustValue = Math.abs(this.thrust);
+						this.thrust = 0;
+						if(this.tryThrowSpear(player, world)) {
+							this.send(thrustValue, (EntityClientPlayerMP) player);
+						}
+					}
+					if(this.thrust > 2.5F) {
+						this.thrust = 2.5F;
+					}
+					this.lastTickMouseButton0 = isButton0Down;
+					
+				} else {
+					this.thrust = 0;
+					this.lastTickMouseButton0 = false;
 				}
-				this.lastTickMouseButton0 = isButton0Down;
 			}
 		}
 		if(this.throwDelay > 0) {
@@ -83,7 +99,7 @@ public class ItemSpear extends ItemSword {
 		}
 	}
 	
-	public void throwSpear(EntityPlayer player, World world) {
+	public void throwSpear(EntityPlayer player, World world, float value) {
         if (!player.capabilities.isCreativeMode)
         {
             --player.getCurrentEquippedItem().stackSize;
@@ -91,9 +107,12 @@ public class ItemSpear extends ItemSword {
 
         world.playSoundAtEntity(player, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
+        this.thrustValue = value;
         EntitySpear entity = new EntitySpear(world, player, this.thrustValue);
         if(player.capabilities.isCreativeMode) {
         	entity.canBePickedUp = 2;
+        } else {
+        	entity.canBePickedUp = 1;
         }
         world.spawnEntityInWorld(entity);
 	}
@@ -102,7 +121,7 @@ public class ItemSpear extends ItemSword {
 		
 		if(this.throwDelay <= 0) {
 			this.throwDelay = 20;
-			this.throwSpear(player, world);
+			this.throwSpear(player, world, this.thrustValue);
 	        return true;
 		}
 		return false;

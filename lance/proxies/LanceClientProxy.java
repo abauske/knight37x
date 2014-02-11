@@ -28,5 +28,6 @@ public class LanceClientProxy extends LanceCommonProxy {
 		MinecraftForgeClient.registerItemRenderer(Lance.lanceUpSteel, (IItemRenderer) new RenderLanceUp("textures/models/modelLanceUpSteel.png"));
 		
 		MinecraftForgeClient.registerItemRenderer(Lance.spear, (IItemRenderer) new RenderSpear());
+		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSpearEntity());
     }
 }
