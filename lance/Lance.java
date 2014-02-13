@@ -11,6 +11,7 @@ import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ServerCommandManager;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -82,12 +83,14 @@ public class Lance {
 	public static Item lanceUpSteel;
 	private int lanceUpSteelID = 457;
 	
+	// Other:
+	
 	public static Item shaft;
 	private int shaftID = 460;
 	
-	// Spears:
-	
 	public static Item spear;
+	
+	public static Item bracket;
 	
 	//Other Configurations:
 	public static boolean shouldLanceBreak = true;
@@ -144,10 +147,11 @@ public class Lance {
 		lanceOnSteel = new ItemLanceSteel().setUnlocalizedName("lanceS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 		lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 		
-		
 		//Spear
 		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
 		
+		//Bracket:
+		bracket = new ItemBracket(EntityBracket.class).setUnlocalizedName("bracket").setCreativeTab(CreativeTabs.tabDecorations).setTextureName("lance:bracket");
 		
 		registerItems();
 	}
@@ -157,7 +161,7 @@ public class Lance {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
 		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
-//		RenderingRegistry.registerEntityRenderingHandler(EntitySpear.class, new RenderSnowball(this.spear));
+//		EntityRegistry.registerGlobalEntityID(EntityBracket.class, "Bracket", EntityRegistry.findGlobalUniqueEntityId());
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -196,6 +200,8 @@ public class Lance {
 		GameRegistry.registerItem(shaft, "shaft");
 		
 		GameRegistry.registerItem(spear, "spear");
+		
+		GameRegistry.registerItem(bracket, "bracket");
 	}
 	
 	public static boolean isAvailable(String item) {
