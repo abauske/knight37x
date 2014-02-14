@@ -90,8 +90,6 @@ public class Lance {
 	
 	public static Item spear;
 	
-	public static Item bracket;
-	
 	//Other Configurations:
 	public static boolean shouldLanceBreak = true;
 	private int numberOfHits = 500;
@@ -150,9 +148,6 @@ public class Lance {
 		//Spear
 		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
 		
-		//Bracket:
-		bracket = new ItemBracket(EntityBracket.class).setUnlocalizedName("bracket").setCreativeTab(CreativeTabs.tabDecorations).setTextureName("lance:bracket");
-		
 		registerItems();
 	}
 
@@ -200,8 +195,6 @@ public class Lance {
 		GameRegistry.registerItem(shaft, "shaft");
 		
 		GameRegistry.registerItem(spear, "spear");
-		
-		GameRegistry.registerItem(bracket, "bracket");
 	}
 	
 	public static boolean isAvailable(String item) {

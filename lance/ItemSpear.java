@@ -64,16 +64,19 @@ public class ItemSpear extends ItemSword {
 			EntityPlayer player = (EntityPlayer) entity;
 			Item spear = player.getCurrentEquippedItem() != null ? player.getCurrentEquippedItem().getItem() : null;
 			if(StaticMethods.isRunningOnClient()) {
+				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindUseItem.func_151470_d();
 				boolean flag = true;
-				MovingObjectPosition mov = Minecraft.getMinecraft().objectMouseOver;
-				if(mov.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-					Block block = world.func_147439_a(mov.blockX, mov.blockY, mov.blockZ);
-					if(block.func_149727_a(world, mov.blockX, mov.blockY, mov.blockZ, player, 0, 0, 0, 0)) {
-						flag = false;
+				if(isButton0Down) {
+					MovingObjectPosition mov = Minecraft.getMinecraft().objectMouseOver;
+					if(mov.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
+						Block block = world.func_147439_a(mov.blockX, mov.blockY, mov.blockZ);
+						if(block.func_149727_a(world, mov.blockX, mov.blockY, mov.blockZ, player, 0, 0, 0, 0)) {
+							flag = false;
+						}
 					}
 				}
+				
 				if(spear != null && spear == this && flag) {
-					boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindUseItem.func_151470_d();
 					if(isButton0Down && this.thrust < 2.5F) {
 						this.thrust += 0.1F;
 					} else if(!isButton0Down && this.lastTickMouseButton0) {
