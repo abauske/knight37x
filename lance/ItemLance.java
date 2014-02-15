@@ -147,13 +147,13 @@ public class ItemLance extends ItemSword {
 			EntityPlayer player = (EntityPlayer) entity;
 			this.player = player;
 			if(StaticMethods.isRunningOnClient()) {
-				if(Minecraft.getMinecraft().gameSettings.keyBindForward.func_151470_d()) {
+				if(Minecraft.getMinecraft().gameSettings.keyBindForward.getIsKeyPressed()) {
 					this.fwdTime = Minecraft.getSystemTime() + 200;
 //					this.sendIsForwardKeyPressed(true, (EntityClientPlayerMP) player);
 	    		}
 				
 				this.hit = 0.0F;
-				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindAttack.func_151470_d();
+				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindAttack.getIsKeyPressed();
 				if(isButton0Down && knockTime < 1) {
 					this.knockTime += 0.03F;
 				} else if(!isButton0Down && this.lastTickMouseButton0) {
@@ -185,7 +185,7 @@ public class ItemLance extends ItemSword {
 			if(player.getCurrentEquippedItem() != null && player.getCurrentEquippedItem().getItem() instanceof ItemLance) {
 				if (StaticMethods.isRunningOnClient() && this.getMouseOver() != null) {
 					Entity aim = this.getMouseOver();
-					this.entity(aim.func_145782_y(), player, world);
+					this.entity(aim.getEntityId(), player, world);
 //					this.sendID(aim.func_145782_y(), (EntityClientPlayerMP) player);
 				}
 				if(player.getCurrentEquippedItem() != null) {
@@ -424,7 +424,7 @@ public class ItemLance extends ItemSword {
 			hurt *= this.getStrengh();
 			if(hurt != 0) {
 //				entity.attackEntityFrom(DamageSource.causePlayerDamage(player), hurt);
-				this.send(entity.func_145782_y(), hurt, (EntityClientPlayerMP) player);
+				this.send(entity.getEntityId(), hurt, (EntityClientPlayerMP) player);
 			}
 		}
 	}
@@ -487,7 +487,7 @@ public class ItemLance extends ItemSword {
 
 	
 	private Entity getRightEntity(World world, Entity entity) {
-		return this.getRightEntity(world, entity.func_145782_y());
+		return this.getRightEntity(world, entity.getEntityId());
 	}
 	
 	public static Entity getRightEntity(World world, int id) {
@@ -495,7 +495,7 @@ public class ItemLance extends ItemSword {
 		for(int i = 0; i < world.loadedEntityList.size(); i++) {
 			Entity current = (Entity) list.toArray()[i];
 			if(current != null) {
-				if(current.func_145782_y() == id) {
+				if(current.getEntityId() == id) {
 					return current;
 				}
 			}
@@ -513,11 +513,11 @@ public class ItemLance extends ItemSword {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void send(int entityID, float hurt, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
-		data.writeInt(player.func_145782_y());
+		data.writeInt(player.getEntityId());
 		data.writeInt(entityID);
 		data.writeFloat(hurt);
 		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-		player.sendQueue.func_147297_a(packet);
+		player.sendQueue.addToSendQueue(packet);
 	}
 	
 	@Override

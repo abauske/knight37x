@@ -90,6 +90,8 @@ public class Lance {
 	
 	public static Item spear;
 	
+	public static Item ballista;
+	
 	//Other Configurations:
 	public static boolean shouldLanceBreak = true;
 	private int numberOfHits = 500;
@@ -145,8 +147,10 @@ public class Lance {
 		lanceOnSteel = new ItemLanceSteel().setUnlocalizedName("lanceS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 		lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 		
-		//Spear
+		//Other
 		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
+		
+		ballista = new ItemBallista().setUnlocalizedName("ballista").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:ballista").setMaxStackSize(1);
 		
 		registerItems();
 	}
@@ -156,7 +160,7 @@ public class Lance {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
 		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
-//		EntityRegistry.registerGlobalEntityID(EntityBracket.class, "Bracket", EntityRegistry.findGlobalUniqueEntityId());
+		EntityRegistry.registerGlobalEntityID(EntityBallista.class, "Ballista", 0);
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -195,6 +199,8 @@ public class Lance {
 		GameRegistry.registerItem(shaft, "shaft");
 		
 		GameRegistry.registerItem(spear, "spear");
+		
+		GameRegistry.registerItem(ballista, "ballista");
 	}
 	
 	public static boolean isAvailable(String item) {

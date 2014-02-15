@@ -233,12 +233,12 @@ public class EntitySpear extends Entity implements IProjectile
             this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f) * 180.0D / Math.PI);
         }
 
-        Block block = this.worldObj.func_147439_a(this.x, this.y, this.z);
+        Block block = this.worldObj.getBlock(this.x, this.y, this.z);
 
-        if (block.func_149688_o() != Material.field_151579_a)
+        if (block.getMaterial() != Material.air)
         {
-            block.func_149719_a(this.worldObj, this.x, this.y, this.z);
-            AxisAlignedBB axisalignedbb = block.func_149668_a(this.worldObj, this.x, this.y, this.z);
+            block.setBlockBoundsBasedOnState(this.worldObj, this.x, this.y, this.z);
+            AxisAlignedBB axisalignedbb = block.getCollisionBoundingBoxFromPool(this.worldObj, this.x, this.y, this.z);
 
             if (axisalignedbb != null && axisalignedbb.isVecInside(this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ)))
             {
@@ -399,7 +399,7 @@ public class EntitySpear extends Entity implements IProjectile
 
                                 if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity && movingobjectposition.entityHit instanceof EntityPlayer && this.shootingEntity instanceof EntityPlayerMP)
                                 {
-                                    ((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.func_147359_a(new S2BPacketChangeGameState(6, 0.0F));
+                                    ((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(6, 0.0F));
                                 }
                             }
 
@@ -443,9 +443,9 @@ public class EntitySpear extends Entity implements IProjectile
                     this.arrowShake = 7;
                     this.setIsCritical(false);
 
-                    if (this.block.func_149688_o() != Material.field_151579_a)
+                    if (this.block.getMaterial() != Material.air)
                     {
-                        this.block.func_149670_a(this.worldObj, this.x, this.y, this.z, this);
+                        this.block.onEntityCollidedWithBlock(this.worldObj, this.x, this.y, this.z, this);
                     }
                 }
             }
@@ -525,7 +525,7 @@ public class EntitySpear extends Entity implements IProjectile
         par1NBTTagCompound.setShort("yTile", (short)this.y);
         par1NBTTagCompound.setShort("zTile", (short)this.z);
         par1NBTTagCompound.setShort("life", (short)this.ticksInGround);
-        par1NBTTagCompound.setByte("inTile", (byte)Block.func_149682_b(this.block));
+        par1NBTTagCompound.setByte("inTile", (byte)Block.getIdFromBlock(this.block));
         par1NBTTagCompound.setByte("inData", (byte)this.inData);
         par1NBTTagCompound.setByte("shake", (byte)this.arrowShake);
         par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
@@ -544,21 +544,21 @@ public class EntitySpear extends Entity implements IProjectile
         this.y = par1NBTTagCompound.getShort("yTile");
         this.z = par1NBTTagCompound.getShort("zTile");
         this.ticksInGround = par1NBTTagCompound.getShort("life");
-        this.block = Block.func_149729_e(par1NBTTagCompound.getByte("inTile") & 255);
+        this.block = Block.getBlockById(par1NBTTagCompound.getByte("inTile") & 255);
         this.inData = par1NBTTagCompound.getByte("inData") & 255;
         this.arrowShake = par1NBTTagCompound.getByte("shake") & 255;
         this.inGround = par1NBTTagCompound.getByte("inGround") == 1;
 
-        if (par1NBTTagCompound.func_150297_b("damage", 99))
+        if (par1NBTTagCompound.hasKey("damage", 99))
         {
             this.damage = par1NBTTagCompound.getDouble("damage");
         }
 
-        if (par1NBTTagCompound.func_150297_b("pickup", 99))
+        if (par1NBTTagCompound.hasKey("pickup", 99))
         {
             this.canBePickedUp = par1NBTTagCompound.getByte("pickup");
         }
-        else if (par1NBTTagCompound.func_150297_b("player", 99))
+        else if (par1NBTTagCompound.hasKey("player", 99))
         {
             this.canBePickedUp = par1NBTTagCompound.getBoolean("player") ? 1 : 0;
         }

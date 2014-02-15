@@ -64,13 +64,13 @@ public class ItemSpear extends ItemSword {
 			EntityPlayer player = (EntityPlayer) entity;
 			Item spear = player.getCurrentEquippedItem() != null ? player.getCurrentEquippedItem().getItem() : null;
 			if(StaticMethods.isRunningOnClient()) {
-				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindUseItem.func_151470_d();
+				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindUseItem.getIsKeyPressed();
 				boolean flag = true;
 				if(isButton0Down) {
 					MovingObjectPosition mov = Minecraft.getMinecraft().objectMouseOver;
 					if(mov.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
-						Block block = world.func_147439_a(mov.blockX, mov.blockY, mov.blockZ);
-						if(block.func_149727_a(world, mov.blockX, mov.blockY, mov.blockZ, player, 0, 0, 0, 0)) {
+						Block block = world.getBlock(mov.blockX, mov.blockY, mov.blockZ);
+						if(block.onBlockActivated(world, mov.blockX, mov.blockY, mov.blockZ, player, 0, 0, 0, 0)) {
 							flag = false;
 						}
 					}
@@ -133,9 +133,9 @@ public class ItemSpear extends ItemSword {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void send(float thrust, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
-		data.writeInt(player.func_145782_y());
+		data.writeInt(player.getEntityId());
 		data.writeFloat(thrust);
 		C17PacketCustomPayload packet = new C17PacketCustomPayload("spear", data);
-		player.sendQueue.func_147297_a(packet);
+		player.sendQueue.addToSendQueue(packet);
 	}
 }
