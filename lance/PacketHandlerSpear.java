@@ -29,16 +29,19 @@ public class PacketHandlerSpear extends SimpleChannelInboundHandler<FMLProxyPack
 			try {
 				ByteBuf payload = packet.payload();
 				MinecraftServer server = MinecraftServer.getServer();
-				EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(payload.readInt());
-				ItemStack stack = player.getCurrentEquippedItem();
-				Item item = null;
-				if(stack != null) {
-					item = stack.getItem();
-				}
-				if(item instanceof ItemSpear && player != null) {
-					ItemSpear spear = (ItemSpear) item;
-					spear.throwSpear(player, server.getEntityWorld(), payload.readFloat());
-					
+				int flag = payload.readInt();
+				int pid = payload.readInt();
+				EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(pid);
+				if(flag == 0) {
+					ItemStack stack = player.getCurrentEquippedItem();
+					Item item = null;
+					if(stack != null) {
+						item = stack.getItem();
+					}
+					if(item instanceof ItemSpear && player != null) {
+						ItemSpear spear = (ItemSpear) item;
+						spear.throwSpear(player, server.getEntityWorld(), payload.readFloat(), payload.readInt());
+					}
 				}
 			} catch(Exception e) {
 //				e.printStackTrace();

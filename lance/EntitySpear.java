@@ -1,17 +1,23 @@
 package knight37x.lance;
 
+import static io.netty.buffer.Unpooled.buffer;
+import cpw.mods.fml.common.eventhandler.EventPriority;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.entity.EntityClientPlayerMP;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.passive.EntitySheep;
 import net.minecraft.entity.player.EntityPlayer;
@@ -20,6 +26,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S2BPacketChangeGameState;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.AxisAlignedBB;
@@ -257,21 +264,10 @@ public class EntitySpear extends Entity implements IProjectile
 
             if (block == this.block && j == this.inData)
             {
-            	if(this.canBePickedUp != 1) {
-                    ++this.ticksInGround;
-
-                    if (this.ticksInGround == 1200)
-                    {
-                        this.setDead();
-                    }
-            	} else {
-            		++this.ticksInGround;
-
-                    if (this.ticksInGround == 24000)
-                    {
-                        this.setDead();
-                    }
+            	if(this.canBePickedUp == 1 && !this.worldObj.isRemote && !this.isDead) {
+            		this.dropItem(Lance.spear, 1);
             	}
+        		this.setDead();
             }
             else
             {
@@ -404,11 +400,11 @@ public class EntitySpear extends Entity implements IProjectile
                             }
 
                             this.playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
-
-                            if (!(movingobjectposition.entityHit instanceof EntityEnderman) && this.canBePickedUp != 1)
-                            {
-                                this.setDead();
-                            }
+                            
+                            if(this.canBePickedUp == 1 && !this.worldObj.isRemote && !this.isDead) {
+                        		movingobjectposition.entityHit.dropItem(Lance.spear, 1);
+                        	}
+                    		this.setDead();
                         }
                         else
                         {
@@ -519,74 +515,13 @@ public class EntitySpear extends Entity implements IProjectile
     /**
      * (abstract) Protected helper method to write subclass entity data to NBT.
      */
-    public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-    {
-        par1NBTTagCompound.setShort("xTile", (short)this.x);
-        par1NBTTagCompound.setShort("yTile", (short)this.y);
-        par1NBTTagCompound.setShort("zTile", (short)this.z);
-        par1NBTTagCompound.setShort("life", (short)this.ticksInGround);
-        par1NBTTagCompound.setByte("inTile", (byte)Block.getIdFromBlock(this.block));
-        par1NBTTagCompound.setByte("inData", (byte)this.inData);
-        par1NBTTagCompound.setByte("shake", (byte)this.arrowShake);
-        par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
-        par1NBTTagCompound.setByte("pickup", (byte)this.canBePickedUp);
-        par1NBTTagCompound.setDouble("damage", this.damage);
-    }
+    public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {}
 
     @Override
     /**
      * (abstract) Protected helper method to read subclass entity data from NBT.
      */
-    public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-    {
-    	this.reload = true;
-        this.x = par1NBTTagCompound.getShort("xTile");
-        this.y = par1NBTTagCompound.getShort("yTile");
-        this.z = par1NBTTagCompound.getShort("zTile");
-        this.ticksInGround = par1NBTTagCompound.getShort("life");
-        this.block = Block.getBlockById(par1NBTTagCompound.getByte("inTile") & 255);
-        this.inData = par1NBTTagCompound.getByte("inData") & 255;
-        this.arrowShake = par1NBTTagCompound.getByte("shake") & 255;
-        this.inGround = par1NBTTagCompound.getByte("inGround") == 1;
-
-        if (par1NBTTagCompound.hasKey("damage", 99))
-        {
-            this.damage = par1NBTTagCompound.getDouble("damage");
-        }
-
-        if (par1NBTTagCompound.hasKey("pickup", 99))
-        {
-            this.canBePickedUp = par1NBTTagCompound.getByte("pickup");
-        }
-        else if (par1NBTTagCompound.hasKey("player", 99))
-        {
-            this.canBePickedUp = par1NBTTagCompound.getBoolean("player") ? 1 : 0;
-        }
-    }
-
-    /**
-     * Called by a player entity when they collide with an entity
-     */
-    public void onCollideWithPlayer(EntityPlayer par1EntityPlayer)
-    {
-        boolean test = StaticMethods.isRunningOnClient();
-        if (this.inGround && this.arrowShake <= 0)
-        {
-            boolean flag = this.canBePickedUp == 1 || this.canBePickedUp == 2 && par1EntityPlayer.capabilities.isCreativeMode;
-
-            if (!this.worldObj.isRemote && this.canBePickedUp == 1 && !par1EntityPlayer.inventory.addItemStackToInventory(new ItemStack(Lance.spear, 1)))
-            {
-                flag = false;
-            }
-
-            if (flag)
-            {
-                this.playSound("random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-                par1EntityPlayer.onItemPickup(this, 1);
-                this.setDead();
-            }
-        }
-    }
+    public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {}
 
     /**
      * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to

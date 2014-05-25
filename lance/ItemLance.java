@@ -65,7 +65,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
-public class ItemLance extends ItemSword {
+public abstract class ItemLance extends ItemSword {
 
 //	private int counter1 = 0;
 	
@@ -101,9 +101,7 @@ public class ItemLance extends ItemSword {
 		setCreativeTab(null);
 	}
 	
-	public String getMaterialString() {
-		return "";
-	}
+	public abstract String getMaterialString();
 
 	@SideOnly(Side.CLIENT)
 
@@ -126,9 +124,7 @@ public class ItemLance extends ItemSword {
 		return itemstack;
 	}
 	
-	public Item getSwitch() {
-		return null;
-	}
+	public abstract Item getSwitch();
 	
     /**
      * returns the action that specifies what animation to play when the items is being used
@@ -353,38 +349,8 @@ public class ItemLance extends ItemSword {
 	public boolean onEntitySwing(EntityLivingBase entityLiving, ItemStack stack) {
 		return true;
 	}
-	
-	private void knockBack(EntityLivingBase entity, EntityPlayer player) {
-		int speed;
-		if(player.isSprinting()) {
-			speed = 10;
-		} else if(player.isRiding()) {
-			Entity ridingEntity = player.ridingEntity;
-			if(ridingEntity instanceof EntityPig) {
-				speed = 5;
-			} else {
-				speed = 2;
-			}
-		} else if(player.isSneaking()) {
-			speed = 0;
-		}  else {
-			speed = 2;
-		}
-		
-		double d0 = player.posX - entity.posX;
-        double d1;
-
-        for (d1 = player.posZ - entity.posZ; d0 * d0 + d1 * d1 < 1.0E-4D; d1 = (Math.random() - Math.random()) * 0.01D)
-        {
-            d0 = (Math.random() - Math.random()) * 0.01D;
-        }
-
-        entity.attackedAtYaw = (float)(Math.atan2(d1, d0) * 180.0D / Math.PI) - entity.rotationYaw;
-        entity.knockBack(player, speed, d0, d1);
-	}
 
 	private void CalcAttack(EntityLivingBase entity, EntityPlayer player) {
-		print(player.getAIMoveSpeed());
 		boolean isForwardKeyPressed = false;
 		if(this.fwdTime >= Minecraft.getSystemTime()) {
 			isForwardKeyPressed = true;
@@ -397,7 +363,7 @@ public class ItemLance extends ItemSword {
 		if(hitUse != 0 || (player.getDistanceToEntity(entity) <= 6 && isForwardKeyPressed)) {
 			float hurt = 0;
 			if(isForwardKeyPressed) {
-				hurt = player.getAIMoveSpeed() * 10;
+				hurt = player.capabilities.getWalkSpeed() * 10;
 			}
 			if(player.isRiding()) {
 				Entity ridingEntity = player.ridingEntity;
@@ -477,9 +443,7 @@ public class ItemLance extends ItemSword {
 		return entity.attackEntityFrom(DamageSource.causePlayerDamage(player), value);
 	}
 	
-	public int getStrengh() {
-		return 0;
-	}
+	public abstract int getStrengh();
 	
  	private double getSpeed(EntityLivingBase entity) {
  		return entity.getDistance(entity.prevPosX, entity.prevPosY, entity.prevPosZ) * 35;

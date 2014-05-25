@@ -43,7 +43,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "lance", name = "Lance Mod", version = "2.4.3.172")
+@Mod(modid = "lance", name = "Lance Mod", version = "2.5.1.172")
 public class Lance {
 	
 	@Instance("lance")
@@ -58,39 +58,28 @@ public class Lance {
 	//-----------------------------------------------------------
 	// All Variables:
 	// Lances:
-
 	public static Item lanceOnIron;
-	private int lanceOnIronID = 450;
-	
 	public static Item lanceUpIron;
-	private int lanceUpIronID = 451;
-	
 	public static Item lanceOnDia;
-	private int lanceOnDiaID = 452;
-	
 	public static Item lanceUpDia;
-	private int lanceUpDiaID = 453;
-	
 	public static Item lanceOnCopper;
-	private int lanceOnCopperID = 454;
-	
 	public static Item lanceUpCopper;
-	private int lanceUpCopperID = 455;
-	
 	public static Item lanceOnSteel;
-	private int lanceOnSteelID = 456;
-	
 	public static Item lanceUpSteel;
-	private int lanceUpSteelID = 457;
 	
 	// Other:
-	
 	public static Item shaft;
-	private int shaftID = 460;
 	
 	public static Item spear;
 	
+	//Ripper:
+	public static Item diamondRipper;
+	public static Item ironRipper;
+	public static Item copperRipper;
+	public static Item steelRipper;
+	
 	//Other Configurations:
+	public static boolean craftableSaddle = true;
 	public static boolean shouldLanceBreak = true;
 	private int numberOfHits = 500;
 	public static boolean shouldTakeDamageFromArmour = true;
@@ -102,17 +91,7 @@ public class Lance {
 	public void preInit(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
-		
-		lanceOnIronID = config.get("ItemIDs", "Iron Lance ID", 450).getInt();
-		lanceUpIronID = config.get("ItemIDs", "Iron Lance Up ID", 451).getInt();
-		lanceOnDiaID = config.get("ItemIDs", "Diamond Lance ID", 452).getInt();
-		lanceUpDiaID = config.get("ItemIDs", "Diamond Lance Up ID", 453).getInt();
-		lanceOnCopperID = config.get("ItemIDs", "Copper Lance ID", 454).getInt();
-		lanceUpCopperID = config.get("ItemIDs", "Copper Lance Up ID", 455).getInt();
-		lanceOnSteelID = config.get("ItemIDs", "Steel Lance ID", 456).getInt();
-		lanceUpSteelID = config.get("ItemIDs", "Steel Lance Up ID", 457).getInt();
-		
-		shaftID = config.get("ItemIDs", "Shaft ID", 460).getInt();
+		craftableSaddle = config.get(Configuration.CATEGORY_GENERAL, "Saddle craftable", true).getBoolean(true);
 		
 		shouldLanceBreak = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take damage?", true).getBoolean(true);
 		shouldTakeDamageFromArmour = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take more damage when hitting an armoured mob?", true).getBoolean(true);
@@ -147,6 +126,12 @@ public class Lance {
 		
 		//Spear
 		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
+
+		//Ripper:
+		diamondRipper = new Item().setTextureName("lance:diamond_ripper").setUnlocalizedName("diamond_ripper").setCreativeTab(CreativeTabs.tabMaterials);
+		ironRipper = new Item().setTextureName("lance:iron_ripper").setUnlocalizedName("iron_ripper").setCreativeTab(CreativeTabs.tabMaterials);
+		copperRipper = new Item().setTextureName("lance:copper_ripper").setUnlocalizedName("copper_ripper").setCreativeTab(CreativeTabs.tabMaterials);
+		steelRipper = new Item().setTextureName("lance:steel_ripper").setUnlocalizedName("steel_ripper").setCreativeTab(CreativeTabs.tabMaterials);
 		
 		registerItems();
 	}
@@ -156,7 +141,6 @@ public class Lance {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
 		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
-//		EntityRegistry.registerGlobalEntityID(EntityBracket.class, "Bracket", EntityRegistry.findGlobalUniqueEntityId());
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -169,16 +153,28 @@ public class Lance {
 	
 	private void registerRecipes()
 	{
+		//Lance Shaft:
 		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpDia, "  X", " # ", "#  ", '#', shaft, 'X', Items.diamond));
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpIron, "  X", " # ", "#  ", '#', shaft, 'X', Items.iron_ingot));
 		
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "ingot_Steel"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "ingot_Copper"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', "steel_ingot"));
-		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', "copper_ingot"));
+		//Lances:
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpDia, "  X", " # ", "#  ", '#', shaft, 'X', diamondRipper));		//Diamond
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpIron, "  X", " # ", "#  ", '#', shaft, 'X', ironRipper));			//Iron
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpCopper, "  X", " # ", "#  ", '#', shaft, 'X', copperRipper));		//Copper
+		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpSteel, "  X", " # ", "#  ", '#', shaft, 'X', steelRipper));		//Steel
 		
+		//Spear:
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(spear, 4), "  X", " # ", "#  ", '#', Items.stick, 'X', Items.iron_ingot));
+		
+		//Saddle:
+		GameRegistry.addRecipe(new ShapedOreRecipe(Items.saddle, "# #", "###", '#', Items.leather));
+		
+		//Rippers:
+		GameRegistry.addRecipe(new ShapedOreRecipe(diamondRipper, " # ", "# #", '#', Items.diamond));
+		GameRegistry.addRecipe(new ShapedOreRecipe(ironRipper, " # ", "# #", '#', Items.iron_ingot));
+		GameRegistry.addRecipe(new ShapedOreRecipe(copperRipper, " # ", "# #", '#', "ingot_Copper"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(copperRipper, " # ", "# #", '#', "copper_ingot"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(steelRipper, " # ", "# #", '#', "ingot_Steel"));
+		GameRegistry.addRecipe(new ShapedOreRecipe(steelRipper, " # ", "# #", '#', "steel_ingot"));
 	}
 	
 	private void registerItems()
@@ -195,15 +191,10 @@ public class Lance {
 		GameRegistry.registerItem(shaft, "shaft");
 		
 		GameRegistry.registerItem(spear, "spear");
-	}
-	
-	public static boolean isAvailable(String item) {
-		String[] names = OreDictionary.getOreNames();
-		for(int i = 0; i < names.length; i++) {
-			if(names[i].equals(item)) {
-				return true;
-			}
-		}
-		return false;
+		
+		GameRegistry.registerItem(diamondRipper, "diamond_ripper");
+		GameRegistry.registerItem(ironRipper, "iron_ripper");
+		GameRegistry.registerItem(copperRipper, "copper_ripper");
+		GameRegistry.registerItem(steelRipper, "steel_ripper");
 	}
 }
