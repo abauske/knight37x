@@ -1,12 +1,9 @@
 package knight37x.lance;
 
+import java.util.EnumMap;
 import java.util.Locale.Category;
 
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.RenderArrow;
-import net.minecraft.client.renderer.entity.RenderSnowball;
-import net.minecraft.client.resources.FolderResourcePack;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ServerCommandManager;
@@ -38,9 +35,9 @@ import knight37x.lance.item.ItemSpearPoison;
 import knight37x.lance.item.ItemSpearTNT;
 import knight37x.lance.network.PacketHandlerLance;
 import knight37x.lance.network.PacketHandlerSpear;
+import knight37x.lance.network.PacketHandler;
 import knight37x.lance.proxies.LanceClientProxy;
 import knight37x.lance.proxies.LanceCommonProxy;
-import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
@@ -50,6 +47,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameData;
@@ -67,8 +65,9 @@ public class Lance {
 	@SidedProxy(clientSide="knight37x.lance.proxies.LanceClientProxy", serverSide="knight37x.lance.proxies.LanceCommonProxy")
 	public static LanceCommonProxy proxy;
 	
-	public static final PacketHandlerLance packetHandlerLance = new PacketHandlerLance();
-	public static final PacketHandlerSpear packetHandlerSpear = new PacketHandlerSpear();
+//	public static final PacketHandlerLance packetHandlerLance = new PacketHandlerLance();
+//	public static final PacketHandlerSpear packetHandlerSpear = new PacketHandlerSpear();
+	public static final PacketHandler packetHandler = new PacketHandler();
 	
 	//-----------------------------------------------------------
 	// All Variables:
@@ -160,8 +159,9 @@ public class Lance {
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
-		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
+//		EnumMap<Side, FMLEmbeddedChannel> test = NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
+//		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
+		packetHandler.initialise();
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
 		FMLCommonHandler.instance().bus().register(new EventHookContainer());
 

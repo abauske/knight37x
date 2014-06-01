@@ -16,5 +16,9 @@ public abstract class StaticMethods {
         	return false;
         }
 	}
+	
+	public static void out(Object o) {
+		System.out.println(o);
+	}
 
 }

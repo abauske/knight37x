@@ -1,6 +1,7 @@
 package knight37x.lance.item;
 
 import static io.netty.buffer.Unpooled.buffer;
+import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.lance.entity.EntitySpear;
 
@@ -10,6 +11,7 @@ import io.netty.buffer.ByteBuf;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.Block;
@@ -191,11 +193,11 @@ public class ItemSpear extends Item {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void send(float thrust, EntityClientPlayerMP player, int spearId)  {
 		ByteBuf data = buffer(4);
-		data.writeInt(0); //Unused till now
+		data.writeInt(1);
 		data.writeInt(player.getEntityId());
 		data.writeFloat(thrust);
 		data.writeInt(spearId);
-		C17PacketCustomPayload packet = new C17PacketCustomPayload("spear", data);
-		player.sendQueue.addToSendQueue(packet);
+		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
+		Lance.packetHandler.sendToServer(packet);
 	}
 }

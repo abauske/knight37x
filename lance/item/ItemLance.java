@@ -22,6 +22,7 @@ import org.lwjgl.input.Mouse;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.common.registry.GameData;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -479,11 +480,13 @@ public abstract class ItemLance extends ItemSword {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void send(int entityID, float hurt, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
+		data.writeInt(0);
 		data.writeInt(player.getEntityId());
 		data.writeInt(entityID);
 		data.writeFloat(hurt);
-		C17PacketCustomPayload packet = new C17PacketCustomPayload("lance", data);
-		player.sendQueue.addToSendQueue(packet);
+		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
+		Lance.packetHandler.sendToServer(packet);
+//		player.sendQueue.addToSendQueue(packet);
 	}
 	
 	@Override
