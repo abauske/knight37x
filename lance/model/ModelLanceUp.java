@@ -1,4 +1,4 @@
-package knight37x.lance;
+package knight37x.lance.model;
 
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;

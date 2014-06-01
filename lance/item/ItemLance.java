@@ -1,4 +1,4 @@
-package knight37x.lance;
+package knight37x.lance.item;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
@@ -12,6 +12,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import knight37x.lance.Lance;
+import knight37x.lance.StaticMethods;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -136,7 +139,6 @@ public abstract class ItemLance extends ItemSword {
 
     @Override
 	public void onUpdate(ItemStack par1ItemStack, World world, Entity entity, int par4, boolean par5) {
-//    	System.out.print(Item.field_150901_e.getObject("iron_lance_on"));
     	this.player = null;
     	this.world = world;
 		if(entity != null && entity instanceof EntityPlayer) {

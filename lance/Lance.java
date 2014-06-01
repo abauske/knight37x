@@ -13,6 +13,7 @@ import net.minecraft.command.ServerCommandManager;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.Item.ToolMaterial;
@@ -24,9 +25,23 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import knight37x.lance.entity.EntitySpear;
+import knight37x.lance.item.ItemLanceCopper;
+import knight37x.lance.item.ItemLanceDiamond;
+import knight37x.lance.item.ItemLanceIron;
+import knight37x.lance.item.ItemLanceSteel;
+import knight37x.lance.item.ItemLanceUp;
+import knight37x.lance.item.ItemShaft;
+import knight37x.lance.item.ItemSpear;
+import knight37x.lance.item.ItemSpearFire;
+import knight37x.lance.item.ItemSpearPoison;
+import knight37x.lance.item.ItemSpearTNT;
+import knight37x.lance.network.PacketHandlerLance;
+import knight37x.lance.network.PacketHandlerSpear;
 import knight37x.lance.proxies.LanceClientProxy;
 import knight37x.lance.proxies.LanceCommonProxy;
 import cpw.mods.fml.client.registry.RenderingRegistry;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -70,7 +85,11 @@ public class Lance {
 	// Other:
 	public static Item shaft;
 	
+	//Spears:
 	public static Item spear;
+	public static Item spearTNT;
+	public static Item spearPoison;
+	public static Item spearFire;
 	
 	//Ripper:
 	public static Item diamondRipper;
@@ -126,6 +145,9 @@ public class Lance {
 		
 		//Spear
 		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
+		spearTNT = new ItemSpearTNT().setUnlocalizedName("spearTNT").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearTNT").setMaxStackSize(16);
+		spearPoison = new ItemSpearPoison().setUnlocalizedName("spearPoison").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearPoison").setMaxStackSize(16);
+		spearFire = new ItemSpearFire().setUnlocalizedName("spearFire").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearFire").setMaxStackSize(16);
 
 		//Ripper:
 		diamondRipper = new Item().setTextureName("lance:diamond_ripper").setUnlocalizedName("diamond_ripper").setCreativeTab(CreativeTabs.tabMaterials);
@@ -141,6 +163,7 @@ public class Lance {
 		NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
 		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
+		FMLCommonHandler.instance().bus().register(new EventHookContainer());
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -164,6 +187,9 @@ public class Lance {
 		
 		//Spear:
 		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(spear, 4), "  X", " # ", "#  ", '#', Items.stick, 'X', Items.iron_ingot));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(spearTNT, 1), "X", "#", 'X', Blocks.tnt, '#', spear));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(spearPoison, 1), "X", "#", 'X', new ItemStack(Items.potionitem, 1, 8196), '#', spear));
+		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(spearFire, 1), "X", "#", 'X', new ItemStack(Items.flint_and_steel, 1, OreDictionary.WILDCARD_VALUE), '#', spear));
 		
 		//Saddle:
 		GameRegistry.addRecipe(new ShapedOreRecipe(Items.saddle, "# #", "###", '#', Items.leather));
@@ -191,6 +217,9 @@ public class Lance {
 		GameRegistry.registerItem(shaft, "shaft");
 		
 		GameRegistry.registerItem(spear, "spear");
+		GameRegistry.registerItem(spearTNT, "spearTNT");
+		GameRegistry.registerItem(spearPoison, "spearPoison");
+		GameRegistry.registerItem(spearFire, "spearFire");
 		
 		GameRegistry.registerItem(diamondRipper, "diamond_ripper");
 		GameRegistry.registerItem(ironRipper, "iron_ripper");

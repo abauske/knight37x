@@ -1,5 +1,6 @@
-package knight37x.lance;
+package knight37x.lance.item;
 
+import knight37x.lance.Lance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;

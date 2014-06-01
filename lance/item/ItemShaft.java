@@ -1,4 +1,4 @@
-package knight37x.lance;
+package knight37x.lance.item;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

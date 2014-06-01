@@ -1,4 +1,4 @@
-package knight37x.lance;
+package knight37x.lance.network;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,6 +7,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 
 import java.io.ByteArrayInputStream;
 
+import knight37x.lance.item.ItemSpear;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

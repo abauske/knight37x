@@ -1,18 +1,15 @@
-package knight37x.lance;
+package knight37x.lance.item;
 
-import java.util.Map;
-
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
+import knight37x.lance.Lance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 
-public class ItemLanceIron extends ItemLance {
-
-	private final String material = "Iron";
-	private final int strengh = 7;
+public class ItemLanceSteel extends ItemLance {
+	
+	private final String material = "Steel";
+	private final int strengh = 6;
 	
 	@Override
 	public String getMaterialString() {
@@ -26,7 +23,7 @@ public class ItemLanceIron extends ItemLance {
 
 	@Override
 	public Item getSwitch() {
-		return Lance.lanceUpIron;
+		return Lance.lanceUpSteel;
 	}
 	
 }

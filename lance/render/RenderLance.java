@@ -1,5 +1,7 @@
-package knight37x.lance;
+package knight37x.lance.render;
 
+import knight37x.lance.item.ItemLance;
+import knight37x.lance.model.ModelLanceUp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;

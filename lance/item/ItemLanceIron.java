@@ -1,23 +1,19 @@
-package knight37x.lance;
+package knight37x.lance.item;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.minecraft.enchantment.EnchantmentData;
+import knight37x.lance.Lance;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import net.minecraft.world.World;
 
-public class ItemLanceDiamond extends ItemLance {
-	
-	private final String material = "Diamond";
-	private final int strengh = 10;
+public class ItemLanceIron extends ItemLance {
+
+	private final String material = "Iron";
+	private final int strengh = 7;
 	
 	@Override
 	public String getMaterialString() {
@@ -31,6 +27,7 @@ public class ItemLanceDiamond extends ItemLance {
 
 	@Override
 	public Item getSwitch() {
-		return Lance.lanceUpDia;
+		return Lance.lanceUpIron;
 	}
+	
 }

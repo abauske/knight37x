@@ -1,6 +1,8 @@
-package knight37x.lance;
+package knight37x.lance.item;
 
 import static io.netty.buffer.Unpooled.buffer;
+import knight37x.lance.StaticMethods;
+import knight37x.lance.entity.EntitySpear;
 
 import com.google.common.collect.Multimap;
 
@@ -25,6 +27,7 @@ import net.minecraft.entity.projectile.EntitySnowball;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemPotion;
 import net.minecraft.item.ItemSnowball;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
@@ -36,13 +39,16 @@ import net.minecraftforge.event.ForgeEventFactory;
 public class ItemSpear extends Item {
 	
 	private float thrust = 0;
-	private float thrustValue = 0;
+	protected float thrustValue = 0;
 	private boolean lastTickMouseButton0 = false;
 	
 	private int throwDelay = 0;
 	
+	protected EntitySpear getSpear(World world, EntityPlayer player) {
+		return new EntitySpear(world, player, this.thrustValue);
+	}
+	
 	public float thrustValue() {
-//		System.out.println(this.thrust);
 		return this.thrust;
 	}
 	
@@ -76,7 +82,7 @@ public class ItemSpear extends Item {
 
 	@Override
 	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity) {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -141,7 +147,7 @@ public class ItemSpear extends Item {
         world.playSoundAtEntity(player, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
         this.thrustValue = value;
-        EntitySpear entity = new EntitySpear(world, player, this.thrustValue);
+        EntitySpear entity = this.getSpear(world, player);
         if(player.capabilities.isCreativeMode) {
         	entity.canBePickedUp = 2;
         } else {
@@ -163,7 +169,7 @@ public class ItemSpear extends Item {
         world.playSoundAtEntity(player, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
         this.thrustValue = value;
-        EntitySpear entity = new EntitySpear(world, player, this.thrustValue);
+        EntitySpear entity = this.getSpear(world, player);
         if(player.capabilities.isCreativeMode) {
         	entity.canBePickedUp = 2;
         } else {
@@ -185,7 +191,7 @@ public class ItemSpear extends Item {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
 	private void send(float thrust, EntityClientPlayerMP player, int spearId)  {
 		ByteBuf data = buffer(4);
-		data.writeInt(0);
+		data.writeInt(0); //Unused till now
 		data.writeInt(player.getEntityId());
 		data.writeFloat(thrust);
 		data.writeInt(spearId);

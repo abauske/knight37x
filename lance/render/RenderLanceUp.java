@@ -1,5 +1,6 @@
-package knight37x.lance;
+package knight37x.lance.render;
 
+import knight37x.lance.model.ModelLanceUp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -9,6 +10,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
+
 import org.lwjgl.opengl.GL11;
 
 public class RenderLanceUp implements IItemRenderer {

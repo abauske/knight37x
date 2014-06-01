@@ -1,4 +1,4 @@
-package knight37x.lance;
+package knight37x.lance.entity;
 
 import static io.netty.buffer.Unpooled.buffer;
 import cpw.mods.fml.common.eventhandler.EventPriority;
@@ -9,6 +9,8 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.List;
 
+import scala.reflect.internal.Trees.Super;
+import knight37x.lance.Lance;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.entity.EntityClientPlayerMP;
@@ -37,38 +39,18 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
-//public class EntitySpear extends EntityArrow {
-//
-//	public EntitySpear(World world) {
-//		super(world);
-//	}
-//	
-//	public EntitySpear(World world, double par2, double par4, double par6) {
-//		super(world, par2, par4, par6);
-//	}
-//	
-//	public EntitySpear(World world, EntityLivingBase entity1, EntityLivingBase entity2, float par4, float par5) {
-//		super(world, entity1, entity2, par4, par5);
-//	}
-//	
-//	public EntitySpear(World world, EntityLivingBase entity, float par3) {
-//		super(world, entity, par3);
-//	}
-//	
-//}
-
 public class EntitySpear extends Entity implements IProjectile
 {
 	public boolean hashit = true;
-	private boolean reload = false;
-	private int reloadCounter = 0;
+	protected boolean reload = false;
+	protected int reloadCounter = 0;
 	
-    private int x = -1;
-    private int y = -1;
-    private int z = -1;
-    private Block block;
-    private int inData;
-    private boolean inGround;
+    protected int x = -1;
+    protected int y = -1;
+    protected int z = -1;
+    protected Block block;
+    protected int inData;
+    protected boolean inGround;
     /**
      * 1 if the player can pick up the arrow
      */
@@ -81,20 +63,20 @@ public class EntitySpear extends Entity implements IProjectile
      * The owner of this arrow.
      */
     public Entity shootingEntity;
-    private int ticksInGround;
-    private int ticksInAir;
-    private double damage = 2.0D;
+    protected int ticksInGround;
+    protected int ticksInAir;
+    protected double damage = 2.0D;
     /**
      * The amount of knockback an arrow applies when it hits a mob.
      */
-    private int knockbackStrength;
+    protected int knockbackStrength;
 
     public EntitySpear(World par1World)
     {
         super(par1World);
         this.hashit = false;
         this.renderDistanceWeight = 10.0D;
-        this.setSize(0.5F, 0.5F);
+        this.setSize(2.2F, 2.2F);
     }
 
     public EntitySpear(World par1World, double par2, double par4, double par6)
@@ -102,7 +84,7 @@ public class EntitySpear extends Entity implements IProjectile
         super(par1World);
         this.hashit = false;
         this.renderDistanceWeight = 10.0D;
-        this.setSize(0.5F, 0.5F);
+        this.setSize(2.2F, 2.2F);
         this.setPosition(par2, par4, par6);
         this.yOffset = 0.0F;
     }
@@ -150,7 +132,7 @@ public class EntitySpear extends Entity implements IProjectile
             this.canBePickedUp = 1;
         }
 
-        this.setSize(0.5F, 0.5F);
+        this.setSize(2.2F, 2.2F);
         this.setLocationAndAngles(par2EntityLivingBase.posX, par2EntityLivingBase.posY + (double)par2EntityLivingBase.getEyeHeight(), par2EntityLivingBase.posZ, par2EntityLivingBase.rotationYaw, par2EntityLivingBase.rotationPitch);
         this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
         this.posY -= 0.10000000149011612D;
@@ -232,7 +214,10 @@ public class EntitySpear extends Entity implements IProjectile
     public void onUpdate()
     {
         super.onUpdate();
-//this.setDead();
+//        this.setDead();
+//        this.motionX = 0;
+//        this.motionY = 0;
+//        this.motionZ = 0;
         if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
         {
             float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
@@ -264,8 +249,8 @@ public class EntitySpear extends Entity implements IProjectile
 
             if (block == this.block && j == this.inData)
             {
-            	if(this.canBePickedUp == 1 && !this.worldObj.isRemote && !this.isDead) {
-            		this.dropItem(Lance.spear, 1);
+            	if(!this.worldObj.isRemote && !this.isDead) {
+            		this.performActionInGround();
             	}
         		this.setDead();
             }
@@ -401,8 +386,8 @@ public class EntitySpear extends Entity implements IProjectile
 
                             this.playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
                             
-                            if(this.canBePickedUp == 1 && !this.worldObj.isRemote && !this.isDead) {
-                        		movingobjectposition.entityHit.dropItem(Lance.spear, 1);
+                            if(!this.worldObj.isRemote && !this.isDead) {
+                        		this.performActionOnHit(movingobjectposition.entityHit);
                         	}
                     		this.setDead();
                         }
@@ -509,6 +494,10 @@ public class EntitySpear extends Entity implements IProjectile
             this.setPosition(this.posX, this.posY, this.posZ);
             this.func_145775_I();
         }
+        
+        if(this.ticksExisted >= 1200) {
+        	this.setDead();
+        }
     }
 
     @Override
@@ -588,5 +577,17 @@ public class EntitySpear extends Entity implements IProjectile
     {
         byte b0 = this.dataWatcher.getWatchableObjectByte(16);
         return (b0 & 1) != 0;
+    }
+    
+    protected void performActionOnHit(Entity entity) {
+    	if(this.canBePickedUp == 1) {
+        	entity.dropItem(Lance.spear, 1);
+    	}
+    }
+    
+    protected void performActionInGround() {
+    	if(this.canBePickedUp == 1) {
+    		this.dropItem(Lance.spear, 1);
+    	}
     }
 }
