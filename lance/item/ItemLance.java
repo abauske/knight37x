@@ -15,6 +15,7 @@ import java.util.Map;
 
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
+import knight37x.lance.render.RenderLance;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -193,19 +194,21 @@ public abstract class ItemLance extends ItemSword {
 					}
 				}
 			}
+			
+
+			if(StaticMethods.isRunningOnClient() && this.knockTime != RenderLance.data.getOrDefault(player.getEntityId(), 0.0F)) {
+				this.sendKnock((EntityClientPlayerMP) player, this.knockTime) ;
+			}
 		}
 		
 		if(this.leftClickCounter > 0) {
 			this.leftClickCounter--;
 		}
 		
-//		this.counter1++;
-//		if(this.counter1 > 9000) {
-//			this.counter1 = 20;
-//		}
 	}
     
-    /*
+
+	/*
      * second part of order
      * world and player can be null too!
      */
@@ -487,6 +490,16 @@ public abstract class ItemLance extends ItemSword {
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 		Lance.packetHandler.sendToServer(packet);
 //		player.sendQueue.addToSendQueue(packet);
+	}
+
+	@SubscribeEvent(priority = EventPriority.NORMAL)
+    private void sendKnock(EntityClientPlayerMP player, float knockTime) {
+		ByteBuf data = buffer(4);
+		data.writeInt(10);
+		data.writeInt(player.getEntityId());
+		data.writeFloat(knockTime);
+		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
+		Lance.packetHandler.sendToServer(packet);
 	}
 	
 	@Override

@@ -41,7 +41,7 @@ public class PacketHandlerSpear extends SimpleChannelInboundHandler<FMLProxyPack
 					}
 					if(item instanceof ItemSpear && player != null) {
 						ItemSpear spear = (ItemSpear) item;
-						spear.throwSpear(player, server.getEntityWorld(), payload.readFloat(), payload.readInt());
+						spear.throwSpear(player, server.getEntityWorld(), payload.readFloat());
 					}
 				}
 			} catch(Exception e) {

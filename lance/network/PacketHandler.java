@@ -7,6 +7,8 @@ import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.lance.item.ItemLance;
 import knight37x.lance.item.ItemSpear;
+import knight37x.lance.render.RenderLance;
+import knight37x.lance.render.RenderSpear;
 import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
@@ -46,20 +48,29 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				 * Packet ids:
 				 * 0 -> Lance
 				 * 1 -> Spear
+				 * 
+				 * 10 -> Pass through: Lance state
+				 * 11 -> Pass through: Spear state
 				 */
 				int packetID = payload.readInt();
 				
-				switch (FMLCommonHandler.instance().getEffectiveSide()) {
-		            case CLIENT:
-		            	this.handleClient(payload, packetID);
-		                break;
-
-		            case SERVER:
-		            	this.handleServer(payload, packetID);
-		                break;
-
-		            default:
-		        }
+				if(StaticMethods.isRunningOnClient()) {
+	            	this.handleClient(payload, packetID);
+				} else {
+	            	this.handleServer(payload, packetID);
+				}
+				
+//				switch (FMLCommonHandler.instance().getEffectiveSide()) {
+//		            case CLIENT:
+//		            	this.handleClient(payload, packetID);
+//		                break;
+//
+//		            case SERVER:
+//		            	this.handleServer(payload, packetID);
+//		                break;
+//
+//		            default:
+//		        }
 			} catch(Exception e) {
 //				e.printStackTrace();
 				System.out.println("problem");
@@ -69,12 +80,8 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 	
 	@SideOnly(Side.CLIENT)
 	private void handleClient(ByteBuf msg, int packetID) {
-		StaticMethods.out("client");
-		if (packetID == 0) {
-			StaticMethods.out("client 0");
-		} else if (packetID == 1) {
+		if (packetID == 1) {
 			Minecraft client = Minecraft.getMinecraft();
-			StaticMethods.out("client 1");
 			World world = client.theWorld;
 			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
 			ItemStack stack = player.getCurrentEquippedItem();
@@ -85,19 +92,22 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 			StaticMethods.out(player);
 			if (item instanceof ItemSpear && player != null) {
 				ItemSpear spear = (ItemSpear) item;
-				spear.throwSpear(player, world, msg.readFloat(), msg.readInt());
+				spear.throwSpearOnOtherClients(player, world, msg.readFloat());
 			}
+		} else if(packetID == 10) {
+			RenderLance.data.put(msg.readInt(), msg.readFloat());
+		} else if(packetID == 11) {
+			int i = msg.readInt();
+			float t = msg.readFloat();
+//			StaticMethods.out(t);
+			RenderSpear.data.put(i, t);
 		}
 	}
 	
 	private void handleServer(ByteBuf msg, int packetID) {
 		MinecraftServer server = MinecraftServer.getServer();
-		FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
-		this.sendToAll(clientmsg);
-		StaticMethods.out("server");
 		
 		if(packetID == 0) {
-			StaticMethods.out("server 0");
 			EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(msg.readInt());
 			ItemStack stack = player.getCurrentEquippedItem();
 			Item item = null;
@@ -117,22 +127,22 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				
 			}
 		} else if(packetID == 1) {
-			StaticMethods.out("server 1");
-//			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "Test");
-//			this.sendToAll(clientmsg);
+			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
+			this.sendToAll(clientmsg);
 			
 			EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(msg.readInt());
 			ItemStack stack = player.getCurrentEquippedItem();
-//			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "Test");
-//			this.sendTo(clientmsg, (EntityPlayerMP) player);
 			Item item = null;
 			if (stack != null) {
 				item = stack.getItem();
 			}
 			if (item instanceof ItemSpear && player != null) {
 				ItemSpear spear = (ItemSpear) item;
-				spear.throwSpear(player, server.getEntityWorld(), msg.readFloat(), msg.readInt());
+				spear.throwSpear(player, server.getEntityWorld(), msg.readFloat());
 			}
+		} else if(packetID == 10 || packetID == 11) {
+			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
+			this.sendToAll(clientmsg);
 		}
 	}
 	

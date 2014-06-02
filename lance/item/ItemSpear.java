@@ -4,6 +4,8 @@ import static io.netty.buffer.Unpooled.buffer;
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.lance.entity.EntitySpear;
+import knight37x.lance.render.RenderLance;
+import knight37x.lance.render.RenderSpear;
 
 import com.google.common.collect.Multimap;
 
@@ -61,7 +63,6 @@ public class ItemSpear extends Item {
 	@Override
 	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer player)
     {
-//        player.setItemInUse(par1ItemStack, this.getMaxItemUseDuration(par1ItemStack));
         return par1ItemStack;
     }
 	
@@ -115,10 +116,9 @@ public class ItemSpear extends Item {
 						this.thrust += 0.1F;
 					} else if(!isButton0Down && this.lastTickMouseButton0) {
 						this.thrustValue = Math.abs(this.thrust);
-						this.thrust = 0;
-						int spearId = this.tryThrowSpear(player, world);
-						if(spearId != 0) {
-							this.send(thrustValue, (EntityClientPlayerMP) player, spearId);
+						this.thrust = 0.0F;
+						if(this.tryThrowSpear(player, world)) {
+							this.send(thrustValue, (EntityClientPlayerMP) player);
 						}
 					}
 					if(this.thrust > 2.5F) {
@@ -126,10 +126,17 @@ public class ItemSpear extends Item {
 					}
 					this.lastTickMouseButton0 = isButton0Down;
 					
+					if(StaticMethods.isRunningOnClient() && this.thrustValue() != RenderSpear.data.getOrDefault(player.getEntityId(), 0.0F)) {
+//						StaticMethods.out(this.thrustValue());
+						this.sendKnock((EntityClientPlayerMP) player, this.thrustValue()) ;
+					}
 				} else {
-					this.thrust = 0;
+//					StaticMethods.out("reset");
+					this.thrust = 0.0F;
 					this.lastTickMouseButton0 = false;
 				}
+				
+				
 			}
 		}
 		if(this.throwDelay > 0) {
@@ -137,7 +144,7 @@ public class ItemSpear extends Item {
 		}
 	}
 	
-	public int throwSpear(EntityPlayer player, World world, float value) {
+	public void throwSpear(EntityPlayer player, World world, float value) {
         if (!player.capabilities.isCreativeMode)
         {
             --player.getCurrentEquippedItem().stackSize;
@@ -156,18 +163,9 @@ public class ItemSpear extends Item {
         	entity.canBePickedUp = 1;
         }
         world.spawnEntityInWorld(entity);
-        return entity.getEntityId();
 	}
 	
-	public void throwSpear(EntityPlayer player, World world, float value, int spearId) {
-        if (!player.capabilities.isCreativeMode)
-        {
-            --player.getCurrentEquippedItem().stackSize;
-            if(player.getCurrentEquippedItem().stackSize <= 0) {
-            	player.setCurrentItemOrArmor(0, null);
-            }
-        }
-
+	public void throwSpearOnOtherClients(EntityPlayer player, World world, float value) {
         world.playSoundAtEntity(player, "random.bow", 0.5F, 0.4F / (itemRand.nextFloat() * 0.4F + 0.8F));
 
         this.thrustValue = value;
@@ -177,26 +175,34 @@ public class ItemSpear extends Item {
         } else {
         	entity.canBePickedUp = 1;
         }
-        entity.setEntityId(spearId);
         world.spawnEntityInWorld(entity);
 	}
 	
-	public int tryThrowSpear(EntityPlayer player, World world) {
+	public boolean tryThrowSpear(EntityPlayer player, World world) {
 		
 		if(this.throwDelay <= 0) {
 			this.throwDelay = 20;
-			return this.throwSpear(player, world, this.thrustValue);
+			return true;
 		}
-		return 0;
+		return false;
 	}
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void send(float thrust, EntityClientPlayerMP player, int spearId)  {
+	private void send(float thrust, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
 		data.writeInt(1);
 		data.writeInt(player.getEntityId());
 		data.writeFloat(thrust);
-		data.writeInt(spearId);
+		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
+		Lance.packetHandler.sendToServer(packet);
+	}
+	
+	@SubscribeEvent(priority = EventPriority.NORMAL)
+    private void sendKnock(EntityClientPlayerMP player, float thrustValue) {
+		ByteBuf data = buffer(4);
+		data.writeInt(11);
+		data.writeInt(player.getEntityId());
+		data.writeFloat(thrustValue);
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 		Lance.packetHandler.sendToServer(packet);
 	}

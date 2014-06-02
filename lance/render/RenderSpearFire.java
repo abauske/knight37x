@@ -19,81 +19,16 @@ import net.minecraftforge.client.IItemRenderer.ItemRenderType;
 import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 
-public class RenderSpearFire implements IItemRenderer {
-
-	protected ModelSpearFireHand model = new ModelSpearFireHand();
-	private static ResourceLocation texture = new ResourceLocation("lance:textures/models/modelSpearFireHand.png");
-	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
-	private float thrust = 0.0F;
-
-	public boolean handleRenderType(ItemStack var1, ItemRenderType type)
-    {
-            switch (type)
-            {
-                    case INVENTORY:
-                    	return false;
-                    case ENTITY:
-                    	return false;
-
-                    default:
-                    	return true;
-            }
-    }
-
-    public boolean shouldUseRenderHelper(ItemRenderType var1, ItemStack var2, ItemRendererHelper var3)
-    {
-            return false;
-    }
-
-	public void renderItem(ItemRenderType type, ItemStack itemstack, Object... var3) {
-		switch (1) {
-		case 1:
-			if(itemstack.getItem() instanceof ItemSpear) {
-				ItemSpear item = (ItemSpear) itemstack.getItem();
-				
-				GL11.glPushMatrix();
-				Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-				
-				this.thrust = item.thrustValue();
-				
-				if (var3.length >= 2 && var3[1] != null && var3[1] instanceof EntityPlayer) {
-
-					if(this.thrust != 0) {
-						if ((EntityPlayer) var3[1] == Minecraft.getMinecraft().renderViewEntity && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 && (!(Minecraft.getMinecraft().currentScreen instanceof GuiInventory) && !(Minecraft.getMinecraft().currentScreen instanceof GuiContainerCreative) || RenderManager.instance.playerViewY != 180.0F)) {
-							GL11.glScalef(0.4F, 0.5F, 0.5F);
-							GL11.glRotatef( 0.0F + 110, 0.0F + 0F, 0.0F + 0F, 0.0F + 1F);
-							GL11.glRotatef( 0.0F + 10F, 0.0F, 0.0F + 1F, 0.0F);
-							GL11.glRotatef( 0.0F + 350, 0.0F + 1F, 0.0F + 0, 0.0F + 0F);
-							GL11.glTranslatef(1.7F, -1F + this.thrust, 0F);
-						} else {
-							GL11.glScalef(0.4F, 0.5F, 0.5F);
-							GL11.glRotatef(0.0F + 180, 0.0F + 1F, 0.0F + 0F, 0.0F + 0F);
-							GL11.glRotatef(0.0F + 0, 0.0F, 0.0F + 1F, 0.0F);
-							GL11.glRotatef(0.0F + 0, 0.0F + 0, 0.0F + 0, 0.0F + 1F);
-							GL11.glTranslatef(1.3F, 0.8F + this.thrust, 0F);
-						}
-					} else if ((EntityPlayer) var3[1] == Minecraft.getMinecraft().renderViewEntity && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 && (!(Minecraft.getMinecraft().currentScreen instanceof GuiInventory) && !(Minecraft.getMinecraft().currentScreen instanceof GuiContainerCreative) || RenderManager.instance.playerViewY != 180.0F)) {
-						GL11.glTranslatef(1.5F, 0.0F, 1.0F);
-						GL11.glScalef(0.4F, 0.5F, 0.5F);
-						GL11.glRotatef(0.0F + 180, 0.0F + 0F, 0.0F + 0F, 0.0F + 1F);
-						GL11.glRotatef(180.0F + 100F, 0.0F, 0.0F + 1F, 0.0F);
-						GL11.glRotatef(0.0F + 0, 0.0F + 1F, 0.0F + 0, 0.0F + 0F);
-					} else {
-						GL11.glScalef(0.4F, 0.5F, 0.5F);
-						GL11.glTranslatef(1.3F, 0.8F, 0F);
-						GL11.glRotatef(0.0F + 180, 0.0F + 1F, 0.0F + 0F, 0.0F + 0F);
-						GL11.glRotatef(0.0F + 180, 0.0F, 0.0F + 1F, 0.0F);
-						GL11.glRotatef(0.0F + 0, 0.0F + 0, 0.0F + 0, 0.0F + 0F);
-					}
-				}
-				
-				if (var3.length > 1) {
-					this.model.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
-				}
-				GL11.glPopMatrix();
-				
-			}
-		default:
-		}
+public class RenderSpearFire extends RenderSpear implements IItemRenderer {
+	
+	@Override
+	public ModelSpear getModel() {
+		return new ModelSpearFireHand();
 	}
+
+	@Override
+	public ResourceLocation getTexture() {
+		return new ResourceLocation("lance:textures/models/modelSpearFireHand.png");
+	}
+	
 }
