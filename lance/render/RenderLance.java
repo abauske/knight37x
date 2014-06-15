@@ -9,6 +9,7 @@ import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
@@ -26,13 +27,17 @@ import org.lwjgl.opengl.GL11;
 public class RenderLance implements IItemRenderer {
 	
 	protected ModelLanceUp model = new ModelLanceUp();
-	private static ResourceLocation texture = new ResourceLocation("textures/models/modelLanceUpIron.png");
+	private ResourceLocation texture = new ResourceLocation("lance:textures/models/modelLanceIron.png");
 	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
+	private int enchCounter = 5;
 	
 	public static HashMap<Integer, Float> data = new HashMap();
-	
+	/**
+	 * location without .png
+	 * @param location
+	 */
 	public RenderLance(String location) {
-		this.texture = new ResourceLocation(location);
+		this.texture = new ResourceLocation(location + ".png");
 	}
 
 	public boolean handleRenderType(ItemStack var1, ItemRenderType type)
@@ -61,9 +66,9 @@ public class RenderLance implements IItemRenderer {
 				ItemLance item = (ItemLance) itemstack.getItem();
 				
 				GL11.glPushMatrix();
+				
 				Minecraft.getMinecraft().renderEngine.bindTexture(texture);
 				boolean var4 = false;
-				
 				
 				if (player.length >= 2 && player[1] != null && player[1] instanceof EntityPlayer) {
 					float knockTime = RenderLance.data.getOrDefault(((Entity) player[1]).getEntityId(), 0.0F);
@@ -89,7 +94,6 @@ public class RenderLance implements IItemRenderer {
 					this.model.render(player[0], 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 				}
 				GL11.glPopMatrix();
-				
 			}
 		default:
 		}

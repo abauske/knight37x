@@ -1,5 +1,6 @@
 package knight37x.lance;
 
+import knight37x.lance.item.ItemSks;
 import knight37x.lance.item.ItemSpearFire;
 
 import com.google.common.eventbus.Subscribe;
@@ -8,12 +9,15 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemCraftedEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.ItemPickupEvent;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayer.EnumStatus;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 
 /**
@@ -38,6 +42,19 @@ public class EventHookContainer {
 						}
 					}
 					return ;
+				}
+			}
+		}
+	}
+	
+	@SubscribeEvent
+	public void entityFallen(LivingFallEvent event) {
+		if(event.entityLiving instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) event.entityLiving;
+			ItemStack stack = player.getCurrentEquippedItem();
+			if(stack != null && stack.getItem() instanceof ItemSks) {
+				if(player.isBlocking() && ((ItemSks) stack.getItem()).isBoosted()) {
+					event.distance = 1;
 				}
 			}
 		}

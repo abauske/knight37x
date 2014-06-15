@@ -6,6 +6,8 @@ import java.util.List;
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.lance.item.ItemLance;
+import knight37x.lance.item.ItemMayorBow;
+import knight37x.lance.item.ItemSks;
 import knight37x.lance.item.ItemSpear;
 import knight37x.lance.render.RenderLance;
 import knight37x.lance.render.RenderSpear;
@@ -48,9 +50,11 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				 * Packet ids:
 				 * 0 -> Lance
 				 * 1 -> Spear
+				 * 2 -> Sks
 				 * 
 				 * 10 -> Pass through: Lance state
 				 * 11 -> Pass through: Spear state
+				 * 12 -> Pass through: Bow state
 				 */
 				int packetID = payload.readInt();
 				
@@ -89,10 +93,26 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 			if (stack != null) {
 				item = stack.getItem();
 			}
-			StaticMethods.out(player);
 			if (item instanceof ItemSpear && player != null) {
 				ItemSpear spear = (ItemSpear) item;
 				spear.throwSpearOnOtherClients(player, world, msg.readFloat());
+			}
+		} else if(packetID == 2) {
+			EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().theWorld.getEntityByID(msg.readInt());
+			ItemStack stack = player.getCurrentEquippedItem();
+			Item item = null;
+			if (stack != null) {
+				item = stack.getItem();
+			}
+			if (item instanceof ItemSks && player != null) {
+				ItemSks sks = (ItemSks) item;
+				sks.knockBack(player, msg.readDouble(), msg.readDouble(), msg.readDouble());
+				if(msg.readBoolean()) {
+					stack.damageItem(1, player);
+					if(stack.getItemDamage() >= stack.getMaxDamage()) {
+						player.setCurrentItemOrArmor(0, null);
+					}
+				}
 			}
 		} else if(packetID == 10) {
 			RenderLance.data.put(msg.readInt(), msg.readFloat());
@@ -101,6 +121,17 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 			float t = msg.readFloat();
 //			StaticMethods.out(t);
 			RenderSpear.data.put(i, t);
+		} else if(packetID == 12) {
+			EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().theWorld.getEntityByID(msg.readInt());
+			ItemStack stack = player.getCurrentEquippedItem();
+			Item item = null;
+			if (stack != null) {
+				item = stack.getItem();
+			}
+			if (item instanceof ItemMayorBow && player != null) {
+				ItemMayorBow bow = (ItemMayorBow) item;
+				bow.setActive(msg.readBoolean());
+			}
 		}
 	}
 	
@@ -140,7 +171,27 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				ItemSpear spear = (ItemSpear) item;
 				spear.throwSpear(player, server.getEntityWorld(), msg.readFloat());
 			}
-		} else if(packetID == 10 || packetID == 11) {
+		} else if(packetID == 2) {
+			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
+			this.sendToAll(clientmsg);
+			
+			EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(msg.readInt());
+			ItemStack stack = player.getCurrentEquippedItem();
+			Item item = null;
+			if (stack != null) {
+				item = stack.getItem();
+			}
+			if (item instanceof ItemSks && player != null) {
+				ItemSks sks = (ItemSks) item;
+				sks.knockBack(player, msg.readDouble(), msg.readDouble(), msg.readDouble());
+				if(msg.readBoolean()) {
+					stack.damageItem(1, player);
+					if(stack.getItemDamage() >= stack.getMaxDamage()) {
+						player.setCurrentItemOrArmor(0, null);
+					}
+				}
+			}
+		} else if(packetID >= 10) {
 			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
 			this.sendToAll(clientmsg);
 		}

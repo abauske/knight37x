@@ -17,6 +17,10 @@ public abstract class StaticMethods {
         }
 	}
 	
+	public static boolean isRunningOnServer() {
+		return !StaticMethods.isRunningOnClient();
+	}
+	
 	public static void out(Object o) {
 		System.out.println(o);
 	}

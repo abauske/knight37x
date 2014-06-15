@@ -4,12 +4,17 @@ import java.util.EnumMap;
 import java.util.Locale.Category;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDispenser;
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ServerCommandManager;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.dispenser.BehaviorProjectileDispense;
+import net.minecraft.dispenser.IPosition;
+import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.EntityEgg;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -18,21 +23,25 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import knight37x.lance.entity.EntitySpear;
+import knight37x.lance.item.ItemEnderCannon;
 import knight37x.lance.item.ItemLanceCopper;
 import knight37x.lance.item.ItemLanceDiamond;
 import knight37x.lance.item.ItemLanceIron;
 import knight37x.lance.item.ItemLanceSteel;
 import knight37x.lance.item.ItemLanceUp;
 import knight37x.lance.item.ItemShaft;
+import knight37x.lance.item.ItemSks;
 import knight37x.lance.item.ItemSpear;
 import knight37x.lance.item.ItemSpearFire;
 import knight37x.lance.item.ItemSpearPoison;
 import knight37x.lance.item.ItemSpearTNT;
+import knight37x.lance.item.ItemMayorBow;
 import knight37x.lance.network.PacketHandlerLance;
 import knight37x.lance.network.PacketHandlerSpear;
 import knight37x.lance.network.PacketHandler;
@@ -69,6 +78,16 @@ public class Lance {
 //	public static final PacketHandlerSpear packetHandlerSpear = new PacketHandlerSpear();
 	public static final PacketHandler packetHandler = new PacketHandler();
 	
+	public static final EventHookContainer eventHandler = new EventHookContainer();
+	
+	public static CreativeTabs tabLance = new CreativeTabs("tabLance") {
+		
+		@Override
+		public Item getTabIconItem() {
+			return Lance.lanceUpIron;
+		}
+	};
+	
 	//-----------------------------------------------------------
 	// All Variables:
 	// Lances:
@@ -83,6 +102,15 @@ public class Lance {
 	
 	// Other:
 	public static Item shaft;
+	public static Item mayorBow;
+//	public static Item enderCannon;
+	
+	//Self-Knockback_Swords
+	public static Item wood_sks;
+	public static Item stone_sks;
+	public static Item iron_sks;
+	public static Item gold_sks;
+	public static Item diamond_sks;
 	
 	//Spears:
 	public static Item spear;
@@ -97,6 +125,7 @@ public class Lance {
 	public static Item steelRipper;
 	
 	//Other Configurations:
+	public static boolean sksOnBlocks = false;
 	public static boolean craftableSaddle = true;
 	public static boolean shouldLanceBreak = true;
 	private int numberOfHits = 500;
@@ -110,6 +139,8 @@ public class Lance {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		craftableSaddle = config.get(Configuration.CATEGORY_GENERAL, "Saddle craftable", true).getBoolean(true);
+		
+		sksOnBlocks = config.get(Configuration.CATEGORY_GENERAL, "Self-Knockback-Sword usable on Blocks (Fast travelling)", false).getBoolean(false);
 		
 		shouldLanceBreak = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take damage?", true).getBoolean(true);
 		shouldTakeDamageFromArmour = config.get(Configuration.CATEGORY_GENERAL, "Should the lance take more damage when hitting an armoured mob?", true).getBoolean(true);
@@ -128,11 +159,19 @@ public class Lance {
 		// ---------------------------------------------------------------------------------------------------------------------------------
 		
 		lanceOnIron = new ItemLanceIron().setUnlocalizedName("lanceI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceIron");
-		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceIron");
+		lanceUpIron = new ItemLanceUp(Lance.lanceOnIron, "Iron").setUnlocalizedName("lanceUpI").setMaxStackSize(1).setMaxDamage(numberOfHits).setTextureName("lance:lanceIron");
 		lanceOnDia = new ItemLanceDiamond().setUnlocalizedName("lanceD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setTextureName("lance:lanceDiamond");
-		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Diamond").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:lanceDiamond");
+		lanceUpDia = new ItemLanceUp(Lance.lanceOnDia, "Diamond").setUnlocalizedName("lanceUpD").setMaxStackSize(1).setMaxDamage(numberOfHits * 6).setTextureName("lance:lanceDiamond");
 		
-		shaft = new ItemShaft().setCreativeTab(CreativeTabs.tabMaterials).setUnlocalizedName("shaft");
+		shaft = new ItemShaft().setCreativeTab(this.tabLance).setUnlocalizedName("shaft").setTextureName("lance:lanceShaft");
+		mayorBow = new ItemMayorBow().setCreativeTab(this.tabLance).setUnlocalizedName("mayorBow").setTextureName("lance:mayorBow_standby").setMaxStackSize(1);
+//		enderCannon = new ItemEnderCannon().setCreativeTab(this.tabLance).setUnlocalizedName("enderCannon").setTextureName("lance:enderCannon");
+		
+		wood_sks = new ItemSks(ToolMaterial.WOOD, "lance:wood_sks").setTextureName("wood_sword").setUnlocalizedName("wood_sks");
+		stone_sks = new ItemSks(ToolMaterial.STONE, "lance:stone_sks").setTextureName("stone_sword").setUnlocalizedName("stone_sks");
+		iron_sks = new ItemSks(ToolMaterial.IRON, "lance:iron_sks").setTextureName("iron_sword").setUnlocalizedName("iron_sks");
+		gold_sks = new ItemSks(ToolMaterial.GOLD, "lance:gold_sks").setTextureName("gold_sword").setUnlocalizedName("gold_sks");
+		diamond_sks = new ItemSks(ToolMaterial.EMERALD, "lance:diamond_sks").setTextureName("diamond_sword").setUnlocalizedName("diamond_sks");
 		
 		//Copper
 		lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
@@ -143,16 +182,16 @@ public class Lance {
 		lanceUpSteel = new ItemLanceUp(Lance.lanceOnSteel, "Steel").setUnlocalizedName("lanceUpS").setMaxStackSize(1).setMaxDamage(numberOfHits * 2).setTextureName("lance:lanceSteel");
 		
 		//Spear
-		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearIron").setMaxStackSize(16);
-		spearTNT = new ItemSpearTNT().setUnlocalizedName("spearTNT").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearTNT").setMaxStackSize(16);
-		spearPoison = new ItemSpearPoison().setUnlocalizedName("spearPoison").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearPoison").setMaxStackSize(16);
-		spearFire = new ItemSpearFire().setUnlocalizedName("spearFire").setCreativeTab(CreativeTabs.tabCombat).setTextureName("lance:spearFire").setMaxStackSize(16);
+		spear = new ItemSpear().setUnlocalizedName("spear").setCreativeTab(this.tabLance).setTextureName("lance:spearIron").setMaxStackSize(16);
+		spearTNT = new ItemSpearTNT().setUnlocalizedName("spearTNT").setCreativeTab(this.tabLance).setTextureName("lance:spearTNT").setMaxStackSize(16);
+		spearPoison = new ItemSpearPoison().setUnlocalizedName("spearPoison").setCreativeTab(this.tabLance).setTextureName("lance:spearPoison").setMaxStackSize(16);
+		spearFire = new ItemSpearFire().setUnlocalizedName("spearFire").setCreativeTab(this.tabLance).setTextureName("lance:spearFire").setMaxStackSize(16);
 
 		//Ripper:
-		diamondRipper = new Item().setTextureName("lance:diamond_ripper").setUnlocalizedName("diamond_ripper").setCreativeTab(CreativeTabs.tabMaterials);
-		ironRipper = new Item().setTextureName("lance:iron_ripper").setUnlocalizedName("iron_ripper").setCreativeTab(CreativeTabs.tabMaterials);
-		copperRipper = new Item().setTextureName("lance:copper_ripper").setUnlocalizedName("copper_ripper").setCreativeTab(CreativeTabs.tabMaterials);
-		steelRipper = new Item().setTextureName("lance:steel_ripper").setUnlocalizedName("steel_ripper").setCreativeTab(CreativeTabs.tabMaterials);
+		diamondRipper = new Item().setTextureName("lance:diamond_ripper").setUnlocalizedName("diamond_ripper").setCreativeTab(this.tabLance);
+		ironRipper = new Item().setTextureName("lance:iron_ripper").setUnlocalizedName("iron_ripper").setCreativeTab(this.tabLance);
+		copperRipper = new Item().setTextureName("lance:copper_ripper").setUnlocalizedName("copper_ripper").setCreativeTab(this.tabLance);
+		steelRipper = new Item().setTextureName("lance:steel_ripper").setUnlocalizedName("steel_ripper").setCreativeTab(this.tabLance);
 		
 		registerItems();
 	}
@@ -163,7 +202,9 @@ public class Lance {
 //		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
 		packetHandler.initialise();
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
-		FMLCommonHandler.instance().bus().register(new EventHookContainer());
+		
+		FMLCommonHandler.instance().bus().register(this.eventHandler);
+		MinecraftForge.EVENT_BUS.register(this.eventHandler);
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -176,7 +217,7 @@ public class Lance {
 	
 	private void registerRecipes()
 	{
-		//Lance Shaft:
+		//Others:
 		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
 		
 		//Lances:
@@ -193,6 +234,13 @@ public class Lance {
 		
 		//Saddle:
 		GameRegistry.addRecipe(new ShapedOreRecipe(Items.saddle, "# #", "###", '#', Items.leather));
+		
+		//Self-Knockback_Swords:
+		GameRegistry.addRecipe(new ShapedOreRecipe(wood_sks, "#", "X", '#', Items.feather, 'X', Items.wooden_sword));
+		GameRegistry.addRecipe(new ShapedOreRecipe(stone_sks, "#", "X", '#', Items.feather, 'X', Items.stone_sword));
+		GameRegistry.addRecipe(new ShapedOreRecipe(iron_sks, "#", "X", '#', Items.feather, 'X', Items.iron_sword));
+		GameRegistry.addRecipe(new ShapedOreRecipe(gold_sks, "#", "X", '#', Items.feather, 'X', Items.golden_sword));
+		GameRegistry.addRecipe(new ShapedOreRecipe(diamond_sks, "#", "X", '#', Items.feather, 'X', Items.diamond_sword));
 		
 		//Rippers:
 		GameRegistry.addRecipe(new ShapedOreRecipe(diamondRipper, " # ", "# #", '#', Items.diamond));
@@ -215,11 +263,18 @@ public class Lance {
 		GameRegistry.registerItem(lanceUpCopper, "copper_lance");
 		
 		GameRegistry.registerItem(shaft, "shaft");
+		GameRegistry.registerItem(mayorBow, "mayorBow");
 		
 		GameRegistry.registerItem(spear, "spear");
 		GameRegistry.registerItem(spearTNT, "spearTNT");
 		GameRegistry.registerItem(spearPoison, "spearPoison");
 		GameRegistry.registerItem(spearFire, "spearFire");
+		
+		GameRegistry.registerItem(wood_sks, "wood_sks");
+		GameRegistry.registerItem(stone_sks, "stone_sks");
+		GameRegistry.registerItem(iron_sks, "iron_sks");
+		GameRegistry.registerItem(gold_sks, "gold_sks");
+		GameRegistry.registerItem(diamond_sks, "diamond_sks");
 		
 		GameRegistry.registerItem(diamondRipper, "diamond_ripper");
 		GameRegistry.registerItem(ironRipper, "iron_ripper");

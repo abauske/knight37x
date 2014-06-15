@@ -1,5 +1,6 @@
 package knight37x.lance.item;
 
+import knight37x.lance.Lance;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ public class ItemLanceUp extends ItemSword {
 	
 	public ItemLanceUp(Item switchTo, String material) {
 		super(ToolMaterial.IRON);
-		setCreativeTab(CreativeTabs.tabCombat);
+		setCreativeTab(Lance.tabLance);
 		this.switchTo = switchTo;
 		this.material = material;
 	}

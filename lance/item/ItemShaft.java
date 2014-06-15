@@ -11,11 +11,5 @@ public class ItemShaft extends Item {
 	public ItemShaft() {
 		super();
 	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void registerIcons(IIconRegister reg) {
-		this.itemIcon = reg.registerIcon("Lance:lanceShaft");
-	}
 
 }
