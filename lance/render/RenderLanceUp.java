@@ -15,10 +15,10 @@ import org.lwjgl.opengl.GL11;
 
 public class RenderLanceUp implements IItemRenderer {
 	protected ModelLanceUp model = new ModelLanceUp();
-	private ResourceLocation texture = new ResourceLocation("textures/models/modelLanceUpIron.png");
+	private ResourceLocation texture = new ResourceLocation("lance:textures/models/modelLanceIron.png");
 	
 	public RenderLanceUp(String location) {
-		this.texture = new ResourceLocation(location);
+		this.texture = new ResourceLocation(location + ".png");
 	}
 	
 	public boolean handleRenderType(ItemStack var1, ItemRenderType type) {

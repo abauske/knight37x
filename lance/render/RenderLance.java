@@ -28,10 +28,17 @@ public class RenderLance implements IItemRenderer {
 	
 	protected ModelLanceUp model = new ModelLanceUp();
 	private ResourceLocation texture = new ResourceLocation("lance:textures/models/modelLanceIron.png");
+<<<<<<< HEAD
+	private int enchCounter = 5;
+	private float knockTime = 0.0F;
+	
+	public static HashMap<Integer, Boolean> data = new HashMap();
+=======
 	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
 	private int enchCounter = 5;
 	
 	public static HashMap<Integer, Float> data = new HashMap();
+>>>>>>> origin/master
 	/**
 	 * location without .png
 	 * @param location
@@ -71,7 +78,16 @@ public class RenderLance implements IItemRenderer {
 				boolean var4 = false;
 				
 				if (player.length >= 2 && player[1] != null && player[1] instanceof EntityPlayer) {
-					float knockTime = RenderLance.data.getOrDefault(((Entity) player[1]).getEntityId(), 0.0F);
+					if(RenderLance.data.getOrDefault(((Entity) player[1]).getEntityId(), false)) {
+						if(this.knockTime < 1.0F) {
+							this.knockTime += 0.03F;
+						}
+						if(this.knockTime > 1.0F) {
+							this.knockTime = 1.0F;
+						}
+					} else {
+						this.knockTime = 0.0F;
+					}
 					float var5;
 
 					if ((EntityPlayer) player[1] == Minecraft.getMinecraft().renderViewEntity && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 && (!(Minecraft.getMinecraft().currentScreen instanceof GuiInventory) && !(Minecraft.getMinecraft().currentScreen instanceof GuiContainerCreative) || RenderManager.instance.playerViewY != 180.0F)) {
@@ -80,13 +96,13 @@ public class RenderLance implements IItemRenderer {
 							GL11.glRotatef( 0.0F + 110, 0.0F + 0F, 0.0F + 0F, 0.0F + 1F);
 							GL11.glRotatef( 0.0F + 10F, 0.0F, 0.0F + 1F, 0.0F);
 							GL11.glRotatef( 0.0F + 350, 0.0F + 1F, 0.0F + 0, 0.0F + 0F);
-							GL11.glTranslatef(0F, -1F + knockTime, 0F);
+							GL11.glTranslatef(0F, -1F + this.knockTime, 0F);
 					} else {
 							GL11.glScalef(1.0F, 1.0F, 1.0F);
 							GL11.glRotatef( 0.0F + 185, 0.0F + 0F, 0.0F + 0F, 0.0F + 1F);
 							GL11.glRotatef( 0.0F + 0F, 0.0F, 0.0F + 1F, 0.0F);
 							GL11.glRotatef( 0.0F + 330, 0.0F + 1F, 0.0F + 0, 0.0F + 0F);
-							GL11.glTranslatef(-0.5F, 0.0F + knockTime, 0.0F);
+							GL11.glTranslatef(-0.5F, 0.0F + this.knockTime, 0.0F);
 					}
 				}
 				

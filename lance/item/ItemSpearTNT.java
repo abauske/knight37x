@@ -1,6 +1,8 @@
 package knight37x.lance.item;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import knight37x.lance.entity.EntitySpear;
 import knight37x.lance.entity.EntitySpearTNT;

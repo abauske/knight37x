@@ -48,6 +48,8 @@ public class ItemSpear extends Item {
 	
 	private int throwDelay = 0;
 	
+	private boolean active = false;
+	
 	protected EntitySpear getSpear(World world, EntityPlayer player) {
 		return new EntitySpear(world, player, this.thrustValue);
 	}
@@ -112,6 +114,9 @@ public class ItemSpear extends Item {
 				}
 				
 				if(spear != null && spear == this && flag) {
+					if(!this.lastTickMouseButton0 && isButton0Down) {
+						this.sendThrust((EntityClientPlayerMP) player, true);
+					}
 					if(isButton0Down && this.thrust < 2.5F) {
 						this.thrust += 0.1F;
 					} else if(!isButton0Down && this.lastTickMouseButton0) {
@@ -126,10 +131,6 @@ public class ItemSpear extends Item {
 					}
 					this.lastTickMouseButton0 = isButton0Down;
 					
-					if(StaticMethods.isRunningOnClient() && this.thrustValue() != RenderSpear.data.getOrDefault(player.getEntityId(), 0.0F)) {
-//						StaticMethods.out(this.thrustValue());
-						this.sendKnock((EntityClientPlayerMP) player, this.thrustValue()) ;
-					}
 				} else {
 //					StaticMethods.out("reset");
 					this.thrust = 0.0F;
@@ -198,12 +199,16 @@ public class ItemSpear extends Item {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-    private void sendKnock(EntityClientPlayerMP player, float thrustValue) {
+    private void sendThrust(EntityClientPlayerMP player, boolean active) {
 		ByteBuf data = buffer(4);
 		data.writeInt(11);
 		data.writeInt(player.getEntityId());
-		data.writeFloat(thrustValue);
+		data.writeBoolean(active);
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 		Lance.packetHandler.sendToServer(packet);
+	}
+	
+	public boolean isActive() {
+		return this.active;
 	}
 }

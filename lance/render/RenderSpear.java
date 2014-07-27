@@ -29,8 +29,9 @@ public class RenderSpear implements IItemRenderer {
 	protected ModelSpear model = new ModelSpear();
 	private ResourceLocation texture;
 	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
+	private float knockTime = 0.0F;
 
-	public static HashMap<Integer, Float> data = new HashMap();
+	public static HashMap<Integer, Boolean> data = new HashMap();
 
 	public RenderSpear() {
 		this.texture = new ResourceLocation("lance:textures/models/modelSpear.png");
@@ -69,9 +70,15 @@ public class RenderSpear implements IItemRenderer {
 				Minecraft.getMinecraft().renderEngine.bindTexture(this.getTexture());
 				
 				if (player.length >= 2 && player[1] != null && player[1] instanceof EntityPlayer) {
-					float knockTime = RenderSpear.data.getOrDefault(((Entity) player[1]).getEntityId(), 0.0F);
-					if(knockTime < 0.1F) {
-						knockTime = 0.0F;
+					if(RenderSpear.data.getOrDefault(((Entity) player[1]).getEntityId(), false)) {
+						if(this.knockTime < 2.5F) {
+							this.knockTime += 0.1F;
+						}
+						if(this.knockTime > 2.5F) {
+							this.knockTime = 2.5F;
+						}
+					} else {
+						this.knockTime = 0.0F;
 					}
 
 					if(knockTime != 0) {

@@ -154,9 +154,13 @@ public abstract class ItemLance extends ItemSword {
 				
 				this.hit = 0.0F;
 				boolean isButton0Down = Minecraft.getMinecraft().gameSettings.keyBindAttack.getIsKeyPressed();
+				if(!this.lastTickMouseButton0 && isButton0Down) {
+					this.sendKnock((EntityClientPlayerMP) player, true);
+				}
 				if(isButton0Down && knockTime < 1) {
 					this.knockTime += 0.03F;
 				} else if(!isButton0Down && this.lastTickMouseButton0) {
+					this.sendKnock((EntityClientPlayerMP) player, false);
 					this.knockTime = -knockTime;
 					this.hit = Math.abs(knockTime);
 					this.knockCounter = 20;
@@ -193,11 +197,6 @@ public abstract class ItemLance extends ItemSword {
 						this.destroy(player);
 					}
 				}
-			}
-			
-
-			if(StaticMethods.isRunningOnClient() && this.knockTime != RenderLance.data.getOrDefault(player.getEntityId(), 0.0F)) {
-				this.sendKnock((EntityClientPlayerMP) player, this.knockTime) ;
 			}
 		}
 		
@@ -493,11 +492,11 @@ public abstract class ItemLance extends ItemSword {
 	}
 
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-    private void sendKnock(EntityClientPlayerMP player, float knockTime) {
+    private void sendKnock(EntityClientPlayerMP player, boolean start) {
 		ByteBuf data = buffer(4);
 		data.writeInt(10);
 		data.writeInt(player.getEntityId());
-		data.writeFloat(knockTime);
+		data.writeBoolean(start);
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 		Lance.packetHandler.sendToServer(packet);
 	}

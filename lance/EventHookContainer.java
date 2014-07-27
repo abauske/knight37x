@@ -12,6 +12,8 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayer.EnumStatus;
+import net.minecraft.init.Items;
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.item.ItemStack;
@@ -34,12 +36,10 @@ public class EventHookContainer {
 		if(event.crafting.getItem() instanceof ItemSpearFire) {
 			for(int i = 0; i < event.craftMatrix.getSizeInventory(); i++) {
 				ItemStack stack = event.craftMatrix.getStackInSlot(i);
-				if(stack != null && stack.getItem() instanceof ItemFlintAndSteel) {
+				if(stack != null && stack.getItem() == Items.flint_and_steel) {
 					if(stack.getMaxDamage() - stack.getItemDamage() > 0) {
-						stack.getItem().setDamage(stack, stack.getItemDamage() + 1);
-						if(!event.player.inventory.addItemStackToInventory(stack)) {
-							event.player.entityDropItem(stack, 0);
-						}
+						ItemStack newStack = new ItemStack(Items.flint_and_steel, 2, stack.getItemDamage() + 1);
+		    			event.craftMatrix.setInventorySlotContents(i, newStack);
 					}
 					return ;
 				}

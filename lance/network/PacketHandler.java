@@ -1,10 +1,12 @@
 package knight37x.lance.network;
 
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
+import knight37x.lance.block.ContainerBowConfig;
 import knight37x.lance.item.ItemLance;
 import knight37x.lance.item.ItemMayorBow;
 import knight37x.lance.item.ItemSks;
@@ -17,6 +19,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
@@ -40,6 +43,8 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 
 	private EnumMap<Side, FMLEmbeddedChannel> channels;
 	
+	private static HashMap<Integer, NetworkBase> handlers = new HashMap();
+	
 	@Override
 	protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
 		if(packet.channel().equals("lance")) {
@@ -51,6 +56,10 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				 * 0 -> Lance
 				 * 1 -> Spear
 				 * 2 -> Sks
+<<<<<<< HEAD
+				 * 3 -> Bow Config Block
+=======
+>>>>>>> origin/master
 				 * 
 				 * 10 -> Pass through: Lance state
 				 * 11 -> Pass through: Spear state
@@ -58,30 +67,19 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				 */
 				int packetID = payload.readInt();
 				
-				if(StaticMethods.isRunningOnClient()) {
-	            	this.handleClient(payload, packetID);
-				} else {
-	            	this.handleServer(payload, packetID);
-				}
-				
-//				switch (FMLCommonHandler.instance().getEffectiveSide()) {
-//		            case CLIENT:
-//		            	this.handleClient(payload, packetID);
-//		                break;
-//
-//		            case SERVER:
-//		            	this.handleServer(payload, packetID);
-//		                break;
-//
-//		            default:
-//		        }
+				PacketHandler.handlers.get(packetID).handle(payload, packetID);
 			} catch(Exception e) {
-//				e.printStackTrace();
+				e.printStackTrace();
 				System.out.println("problem");
 			}
 		}
 	}
 	
+<<<<<<< HEAD
+	public static boolean registerHandler(int packetID, NetworkBase handler) {
+		if(PacketHandler.handlers.containsKey(packetID)) {
+			return false;
+=======
 	@SideOnly(Side.CLIENT)
 	private void handleClient(ByteBuf msg, int packetID) {
 		if (packetID == 1) {
@@ -132,9 +130,18 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				ItemMayorBow bow = (ItemMayorBow) item;
 				bow.setActive(msg.readBoolean());
 			}
+>>>>>>> origin/master
 		}
+		PacketHandler.handlers.put(packetID, handler);
+		return true;
 	}
 	
+<<<<<<< HEAD
+	public static int getFreePacketID() {
+		int i = 0;
+		while(PacketHandler.handlers.containsKey(i)) {
+			i++;
+=======
 	private void handleServer(ByteBuf msg, int packetID) {
 		MinecraftServer server = MinecraftServer.getServer();
 		
@@ -194,11 +201,34 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 		} else if(packetID >= 10) {
 			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
 			this.sendToAll(clientmsg);
+>>>>>>> origin/master
 		}
+		return i;
 	}
 	
 	public void initialise() {
         this.channels = NetworkRegistry.INSTANCE.newChannel("lance", this);
+        
+        /**
+		 * Packet ids:
+		 * 0 -> Lance
+		 * 1 -> Spear
+		 * 2 -> Sks
+		 * 3 -> Bow Config Block
+		 * 
+		 * 10 -> Pass through: Lance state
+		 * 11 -> Pass through: Spear state
+		 * 12 -> Pass through: Bow state
+		 */
+        BasicHandler handler = new BasicHandler();
+		PacketHandler.handlers.put(0, handler);
+		PacketHandler.handlers.put(1, handler);
+		PacketHandler.handlers.put(2, handler);
+		PacketHandler.handlers.put(3, handler);
+		PacketHandler.handlers.put(10, handler);
+		PacketHandler.handlers.put(11, handler);
+		PacketHandler.handlers.put(12, handler);
+        
     }
 	
 	/**

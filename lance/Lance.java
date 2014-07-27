@@ -5,6 +5,10 @@ import java.util.Locale.Category;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDispenser;
+<<<<<<< HEAD
+import net.minecraft.block.material.Material;
+=======
+>>>>>>> origin/master
 import net.minecraft.command.CommandHandler;
 import net.minecraft.command.ICommandManager;
 import net.minecraft.command.ServerCommandManager;
@@ -28,6 +32,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
+import knight37x.lance.block.BlockBowConfig;
+import knight37x.lance.block.GuiHandler;
 import knight37x.lance.entity.EntitySpear;
 import knight37x.lance.item.ItemEnderCannon;
 import knight37x.lance.item.ItemLanceCopper;
@@ -42,8 +48,11 @@ import knight37x.lance.item.ItemSpearFire;
 import knight37x.lance.item.ItemSpearPoison;
 import knight37x.lance.item.ItemSpearTNT;
 import knight37x.lance.item.ItemMayorBow;
+<<<<<<< HEAD
+=======
 import knight37x.lance.network.PacketHandlerLance;
 import knight37x.lance.network.PacketHandlerSpear;
+>>>>>>> origin/master
 import knight37x.lance.network.PacketHandler;
 import knight37x.lance.proxies.LanceClientProxy;
 import knight37x.lance.proxies.LanceCommonProxy;
@@ -74,8 +83,6 @@ public class Lance {
 	@SidedProxy(clientSide="knight37x.lance.proxies.LanceClientProxy", serverSide="knight37x.lance.proxies.LanceCommonProxy")
 	public static LanceCommonProxy proxy;
 	
-//	public static final PacketHandlerLance packetHandlerLance = new PacketHandlerLance();
-//	public static final PacketHandlerSpear packetHandlerSpear = new PacketHandlerSpear();
 	public static final PacketHandler packetHandler = new PacketHandler();
 	
 	public static final EventHookContainer eventHandler = new EventHookContainer();
@@ -103,7 +110,11 @@ public class Lance {
 	// Other:
 	public static Item shaft;
 	public static Item mayorBow;
+<<<<<<< HEAD
+	public static Block bowConfig;
+=======
 //	public static Item enderCannon;
+>>>>>>> origin/master
 	
 	//Self-Knockback_Swords
 	public static Item wood_sks;
@@ -165,6 +176,15 @@ public class Lance {
 		
 		shaft = new ItemShaft().setCreativeTab(this.tabLance).setUnlocalizedName("shaft").setTextureName("lance:lanceShaft");
 		mayorBow = new ItemMayorBow().setCreativeTab(this.tabLance).setUnlocalizedName("mayorBow").setTextureName("lance:mayorBow_standby").setMaxStackSize(1);
+<<<<<<< HEAD
+		bowConfig = new BlockBowConfig(Material.wood).setBlockName("bowConfig").setBlockTextureName("lance:bowConfig").setCreativeTab(this.tabLance).setStepSound(Blocks.crafting_table.stepSound);
+		
+		wood_sks = new ItemSks(ToolMaterial.WOOD, "lance:wood_sks").setTextureName("wood_sword").setUnlocalizedName("wood_sks").setCreativeTab(null);
+		stone_sks = new ItemSks(ToolMaterial.STONE, "lance:stone_sks").setTextureName("stone_sword").setUnlocalizedName("stone_sks").setCreativeTab(null);
+		iron_sks = new ItemSks(ToolMaterial.IRON, "lance:iron_sks").setTextureName("iron_sword").setUnlocalizedName("iron_sks").setCreativeTab(null);
+		gold_sks = new ItemSks(ToolMaterial.GOLD, "lance:gold_sks").setTextureName("gold_sword").setUnlocalizedName("gold_sks").setCreativeTab(null);
+		diamond_sks = new ItemSks(ToolMaterial.EMERALD, "lance:diamond_sks").setTextureName("diamond_sword").setUnlocalizedName("diamond_sks").setCreativeTab(null);
+=======
 //		enderCannon = new ItemEnderCannon().setCreativeTab(this.tabLance).setUnlocalizedName("enderCannon").setTextureName("lance:enderCannon");
 		
 		wood_sks = new ItemSks(ToolMaterial.WOOD, "lance:wood_sks").setTextureName("wood_sword").setUnlocalizedName("wood_sks");
@@ -172,6 +192,7 @@ public class Lance {
 		iron_sks = new ItemSks(ToolMaterial.IRON, "lance:iron_sks").setTextureName("iron_sword").setUnlocalizedName("iron_sks");
 		gold_sks = new ItemSks(ToolMaterial.GOLD, "lance:gold_sks").setTextureName("gold_sword").setUnlocalizedName("gold_sks");
 		diamond_sks = new ItemSks(ToolMaterial.EMERALD, "lance:diamond_sks").setTextureName("diamond_sword").setUnlocalizedName("diamond_sks");
+>>>>>>> origin/master
 		
 		//Copper
 		lanceOnCopper = new ItemLanceCopper().setUnlocalizedName("lanceC").setMaxStackSize(1).setMaxDamage((numberOfHits / 5) * 4).setTextureName("lance:lanceCopper");
@@ -198,8 +219,7 @@ public class Lance {
 
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
-//		EnumMap<Side, FMLEmbeddedChannel> test = NetworkRegistry.INSTANCE.newChannel("lance", packetHandlerLance);
-//		NetworkRegistry.INSTANCE.newChannel("spear", packetHandlerSpear);
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GuiHandler());
 		packetHandler.initialise();
 		EntityRegistry.registerGlobalEntityID(EntitySpear.class, "Spear", EntityRegistry.findGlobalUniqueEntityId());
 		
@@ -219,6 +239,8 @@ public class Lance {
 	{
 		//Others:
 		GameRegistry.addRecipe(new ShapedOreRecipe(shaft, "#  ", " # ", "  #", '#', Items.stick));
+		GameRegistry.addRecipe(new ShapedOreRecipe(mayorBow, " #S", "# S", " #S", '#', Items.bow, 'S', Items.string));
+		GameRegistry.addRecipe(new ShapedOreRecipe(bowConfig, "SCS", "STS", "SBS", 'S', Items.stick, 'C', Blocks.crafting_table, 'T', Items.string, 'B', mayorBow));
 		
 		//Lances:
 		GameRegistry.addRecipe(new ShapedOreRecipe(lanceUpDia, "  X", " # ", "#  ", '#', shaft, 'X', diamondRipper));		//Diamond
@@ -236,11 +258,19 @@ public class Lance {
 		GameRegistry.addRecipe(new ShapedOreRecipe(Items.saddle, "# #", "###", '#', Items.leather));
 		
 		//Self-Knockback_Swords:
+<<<<<<< HEAD
+//		GameRegistry.addRecipe(new ShapedOreRecipe(wood_sks, "#", "X", '#', Items.gunpowder, 'X', Items.wooden_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(stone_sks, "#", "X", '#', Items.gunpowder, 'X', Items.stone_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(iron_sks, "#", "X", '#', Items.gunpowder, 'X', Items.iron_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(gold_sks, "#", "X", '#', Items.gunpowder, 'X', Items.golden_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(diamond_sks, "#", "X", '#', Items.gunpowder, 'X', Items.diamond_sword));
+=======
 		GameRegistry.addRecipe(new ShapedOreRecipe(wood_sks, "#", "X", '#', Items.feather, 'X', Items.wooden_sword));
 		GameRegistry.addRecipe(new ShapedOreRecipe(stone_sks, "#", "X", '#', Items.feather, 'X', Items.stone_sword));
 		GameRegistry.addRecipe(new ShapedOreRecipe(iron_sks, "#", "X", '#', Items.feather, 'X', Items.iron_sword));
 		GameRegistry.addRecipe(new ShapedOreRecipe(gold_sks, "#", "X", '#', Items.feather, 'X', Items.golden_sword));
 		GameRegistry.addRecipe(new ShapedOreRecipe(diamond_sks, "#", "X", '#', Items.feather, 'X', Items.diamond_sword));
+>>>>>>> origin/master
 		
 		//Rippers:
 		GameRegistry.addRecipe(new ShapedOreRecipe(diamondRipper, " # ", "# #", '#', Items.diamond));
@@ -264,6 +294,10 @@ public class Lance {
 		
 		GameRegistry.registerItem(shaft, "shaft");
 		GameRegistry.registerItem(mayorBow, "mayorBow");
+<<<<<<< HEAD
+		GameRegistry.registerBlock(bowConfig, "bowConfig");
+=======
+>>>>>>> origin/master
 		
 		GameRegistry.registerItem(spear, "spear");
 		GameRegistry.registerItem(spearTNT, "spearTNT");
