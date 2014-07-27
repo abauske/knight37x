@@ -50,21 +50,6 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 		if(packet.channel().equals("lance")) {
 			try {
 				ByteBuf payload = packet.payload();
-				
-				/**
-				 * Packet ids:
-				 * 0 -> Lance
-				 * 1 -> Spear
-				 * 2 -> Sks
-<<<<<<< HEAD
-				 * 3 -> Bow Config Block
-=======
->>>>>>> origin/master
-				 * 
-				 * 10 -> Pass through: Lance state
-				 * 11 -> Pass through: Spear state
-				 * 12 -> Pass through: Bow state
-				 */
 				int packetID = payload.readInt();
 				
 				PacketHandler.handlers.get(packetID).handle(payload, packetID);
@@ -75,133 +60,18 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 		}
 	}
 	
-<<<<<<< HEAD
 	public static boolean registerHandler(int packetID, NetworkBase handler) {
 		if(PacketHandler.handlers.containsKey(packetID)) {
 			return false;
-=======
-	@SideOnly(Side.CLIENT)
-	private void handleClient(ByteBuf msg, int packetID) {
-		if (packetID == 1) {
-			Minecraft client = Minecraft.getMinecraft();
-			World world = client.theWorld;
-			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
-			ItemStack stack = player.getCurrentEquippedItem();
-			Item item = null;
-			if (stack != null) {
-				item = stack.getItem();
-			}
-			if (item instanceof ItemSpear && player != null) {
-				ItemSpear spear = (ItemSpear) item;
-				spear.throwSpearOnOtherClients(player, world, msg.readFloat());
-			}
-		} else if(packetID == 2) {
-			EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().theWorld.getEntityByID(msg.readInt());
-			ItemStack stack = player.getCurrentEquippedItem();
-			Item item = null;
-			if (stack != null) {
-				item = stack.getItem();
-			}
-			if (item instanceof ItemSks && player != null) {
-				ItemSks sks = (ItemSks) item;
-				sks.knockBack(player, msg.readDouble(), msg.readDouble(), msg.readDouble());
-				if(msg.readBoolean()) {
-					stack.damageItem(1, player);
-					if(stack.getItemDamage() >= stack.getMaxDamage()) {
-						player.setCurrentItemOrArmor(0, null);
-					}
-				}
-			}
-		} else if(packetID == 10) {
-			RenderLance.data.put(msg.readInt(), msg.readFloat());
-		} else if(packetID == 11) {
-			int i = msg.readInt();
-			float t = msg.readFloat();
-//			StaticMethods.out(t);
-			RenderSpear.data.put(i, t);
-		} else if(packetID == 12) {
-			EntityPlayer player = (EntityPlayer) Minecraft.getMinecraft().theWorld.getEntityByID(msg.readInt());
-			ItemStack stack = player.getCurrentEquippedItem();
-			Item item = null;
-			if (stack != null) {
-				item = stack.getItem();
-			}
-			if (item instanceof ItemMayorBow && player != null) {
-				ItemMayorBow bow = (ItemMayorBow) item;
-				bow.setActive(msg.readBoolean());
-			}
->>>>>>> origin/master
 		}
 		PacketHandler.handlers.put(packetID, handler);
 		return true;
 	}
 	
-<<<<<<< HEAD
 	public static int getFreePacketID() {
 		int i = 0;
 		while(PacketHandler.handlers.containsKey(i)) {
 			i++;
-=======
-	private void handleServer(ByteBuf msg, int packetID) {
-		MinecraftServer server = MinecraftServer.getServer();
-		
-		if(packetID == 0) {
-			EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(msg.readInt());
-			ItemStack stack = player.getCurrentEquippedItem();
-			Item item = null;
-			if(stack != null) {
-				item = stack.getItem();
-			}
-
-			Entity entity = ItemLance.getRightEntity(server.getEntityWorld(), msg.readInt());
-			if(item instanceof ItemLance && player != null && entity != null) {
-				ItemLance lance = (ItemLance) item;
-				
-				if(lance.attack((EntityLivingBase) entity, player, msg.readFloat() + lance.handleEnchants(stack, (EntityLivingBase) entity, player)) && !player.capabilities.isCreativeMode && Lance.shouldLanceBreak) {
-					if(Math.random() < 1.0f / (EnchantmentHelper.getEnchantmentLevel(34, stack) + 1)) {
-						lance.damageLance(entity, player);
-					}
-				}
-				
-			}
-		} else if(packetID == 1) {
-			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
-			this.sendToAll(clientmsg);
-			
-			EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(msg.readInt());
-			ItemStack stack = player.getCurrentEquippedItem();
-			Item item = null;
-			if (stack != null) {
-				item = stack.getItem();
-			}
-			if (item instanceof ItemSpear && player != null) {
-				ItemSpear spear = (ItemSpear) item;
-				spear.throwSpear(player, server.getEntityWorld(), msg.readFloat());
-			}
-		} else if(packetID == 2) {
-			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
-			this.sendToAll(clientmsg);
-			
-			EntityPlayer player = (EntityPlayer) server.getEntityWorld().getEntityByID(msg.readInt());
-			ItemStack stack = player.getCurrentEquippedItem();
-			Item item = null;
-			if (stack != null) {
-				item = stack.getItem();
-			}
-			if (item instanceof ItemSks && player != null) {
-				ItemSks sks = (ItemSks) item;
-				sks.knockBack(player, msg.readDouble(), msg.readDouble(), msg.readDouble());
-				if(msg.readBoolean()) {
-					stack.damageItem(1, player);
-					if(stack.getItemDamage() >= stack.getMaxDamage()) {
-						player.setCurrentItemOrArmor(0, null);
-					}
-				}
-			}
-		} else if(packetID >= 10) {
-			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
-			this.sendToAll(clientmsg);
->>>>>>> origin/master
 		}
 		return i;
 	}

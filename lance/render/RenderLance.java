@@ -28,17 +28,11 @@ public class RenderLance implements IItemRenderer {
 	
 	protected ModelLanceUp model = new ModelLanceUp();
 	private ResourceLocation texture = new ResourceLocation("lance:textures/models/modelLanceIron.png");
-<<<<<<< HEAD
 	private int enchCounter = 5;
 	private float knockTime = 0.0F;
 	
 	public static HashMap<Integer, Boolean> data = new HashMap();
-=======
 	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
-	private int enchCounter = 5;
-	
-	public static HashMap<Integer, Float> data = new HashMap();
->>>>>>> origin/master
 	/**
 	 * location without .png
 	 * @param location
