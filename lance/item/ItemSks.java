@@ -36,7 +36,7 @@ public class ItemSks extends ItemSword {
 	public ItemSks(ToolMaterial toolMaterial, String iconString2) {
 		super(toolMaterial);
 		this.icon2String = iconString2;
-		this.setCreativeTab(Lance.tabLance);
+		this.setCreativeTab(null);
 	}
 	
 	@Override

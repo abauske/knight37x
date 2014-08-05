@@ -103,6 +103,7 @@ public abstract class ItemLance extends ItemSword {
 	
 	public ItemLance() {
 		super(ToolMaterial.IRON);
+		this.setMaxStackSize(1);
 		setCreativeTab(null);
 	}
 	
@@ -221,7 +222,7 @@ public abstract class ItemLance extends ItemSword {
     	
     	Entity aim = this.getRightEntity(world, aimid);
     	if (player != null && aim instanceof EntityLivingBase && player.getDistanceToEntity(aim) <= 12 && !aim.isDead) {
-			this.CalcAttack((EntityLivingBase) aim, player);
+			this.calcAttack((EntityLivingBase) aim, player);
 		}
     }
     
@@ -355,7 +356,7 @@ public abstract class ItemLance extends ItemSword {
 		return true;
 	}
 
-	private void CalcAttack(EntityLivingBase entity, EntityPlayer player) {
+	public void calcAttack(EntityLivingBase entity, EntityPlayer player) {
 		boolean isForwardKeyPressed = false;
 		if(this.fwdTime >= Minecraft.getSystemTime()) {
 			isForwardKeyPressed = true;
@@ -450,7 +451,7 @@ public abstract class ItemLance extends ItemSword {
 	
 	public abstract int getStrengh();
 	
- 	private double getSpeed(EntityLivingBase entity) {
+ 	public double getSpeed(EntityLivingBase entity) {
  		return entity.getDistance(entity.prevPosX, entity.prevPosY, entity.prevPosZ) * 35;
  	}
 
@@ -480,7 +481,7 @@ public abstract class ItemLance extends ItemSword {
 	}
 	
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-	private void send(int entityID, float hurt, EntityClientPlayerMP player)  {
+	public void send(int entityID, float hurt, EntityClientPlayerMP player)  {
 		ByteBuf data = buffer(4);
 		data.writeInt(0);
 		data.writeInt(player.getEntityId());

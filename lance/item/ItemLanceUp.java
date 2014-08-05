@@ -18,7 +18,7 @@ import net.minecraft.world.World;
 
 public class ItemLanceUp extends ItemSword {
 
-	private final Item switchTo;
+	protected final Item switchTo;
 	private final String material;
 	
 	public ItemLanceUp(Item switchTo, String material) {

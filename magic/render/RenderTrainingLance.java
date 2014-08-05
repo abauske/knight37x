@@ -1,43 +1,43 @@
-package knight37x.lance.render;
+package knight37x.magic.render;
 
 import java.util.HashMap;
 
+import knight37x.lance.StaticMethods;
 import knight37x.lance.item.ItemLance;
 import knight37x.lance.model.ModelLanceUp;
+import knight37x.lance.render.RenderLance;
+import knight37x.magic.model.ModelTrainingLance;
+
+import org.lwjgl.opengl.GL11;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainerCreative;
 import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.IIcon;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.IItemRenderer;
+import net.minecraftforge.client.IItemRenderer.ItemRenderType;
+import net.minecraftforge.client.IItemRenderer.ItemRendererHelper;
 import net.minecraftforge.client.model.AdvancedModelLoader;
 
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
+public class RenderTrainingLance implements IItemRenderer {
 
-public class RenderLance implements IItemRenderer {
+	protected ModelTrainingLance model = new ModelTrainingLance();
 	
-	protected ModelLanceUp model = new ModelLanceUp();
-	private ResourceLocation texture = new ResourceLocation("lance:textures/models/modelLanceIron.png");
+	public ResourceLocation[] textures = new ResourceLocation[16];
+	public final String[] colorNames = new String[] {"white", "orange", "magenta", "lightBlue", "yellow", "lime", "pink", "gray", "lightGray", "cyan", "purple", "blue", "brown", "green", "red", "black"};
 	
-	public static HashMap<Integer, Boolean> data = new HashMap();
 	private final AdvancedModelLoader modelLoader = new AdvancedModelLoader();
-	/**
-	 * location without .png
-	 * @param location
-	 */
-	public RenderLance(String location) {
-		this.texture = new ResourceLocation(location + ".png");
+	
+	public RenderTrainingLance() {
+		for(int i = 0; i < colorNames.length; i++) {
+			this.textures[i] = new ResourceLocation("magic:textures/models/trainingLance_" + this.colorNames[i] + ".png");
+		}
 	}
 
 	public boolean handleRenderType(ItemStack var1, ItemRenderType type)
@@ -67,7 +67,7 @@ public class RenderLance implements IItemRenderer {
 				
 				GL11.glPushMatrix();
 				
-				Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+				Minecraft.getMinecraft().renderEngine.bindTexture(this.getTexture(itemstack));
 				boolean var4 = false;
 				
 				if (player.length >= 2 && player[1] != null && player[1] instanceof EntityPlayer) {
@@ -105,11 +105,19 @@ public class RenderLance implements IItemRenderer {
 				}
 				
 				if (player.length > 1) {
-					this.model.render(player[0], 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
+					this.model.render(null, 0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.0625F);
 				}
 				GL11.glPopMatrix();
 			}
 		default:
 		}
+	}
+	
+	public ResourceLocation getTexture(ItemStack stack) {
+		NBTTagCompound tag = stack.stackTagCompound;
+		if(tag != null && tag.hasKey("colorDamage")) {
+			return this.textures[tag.getInteger("colorDamage")];
+		}
+		return this.textures[0];
 	}
 }

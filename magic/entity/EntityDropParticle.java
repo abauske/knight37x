@@ -9,6 +9,8 @@ import io.netty.buffer.ByteBuf;
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.magic.Base;
+import knight37x.magic.VictimWithDrops;
+import knight37x.magic.items.ItemWand;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
@@ -79,11 +81,16 @@ public class EntityDropParticle extends EntityDropParticleFX {
      */
     public void onUpdate()
     {
-//    	if(this.victim != null) {
-//        	StaticMethods.out(this.victim.getEntityId());
-//    	}
+    	if(this.victim != null) {
+        	StaticMethods.out(this.victim.getEntityId());
+    	}
     	if(victim != lastTickVictim && lastTickVictim != null && !lastTickVictim.isDead) {
-    		this.sendMagic(lastTickVictim);
+    		 for(VictimWithDrops v : ((ItemWand) Base.wand).victims) {
+    			 if(v.getVictim() == lastTickVictim) {
+    				 this.sendMagic(lastTickVictim);
+    				 break;
+    			 }
+    		 }
     	}
     	if(victim != null) {
         	lastTickVictim = victim;
@@ -134,10 +141,10 @@ public class EntityDropParticle extends EntityDropParticleFX {
         {
             if (this.materialType == Material.water)
             {
-                this.setDead();
-                if(this.victim != null) {
+                if(this.victim != null && !this.isDead) {
                 	this.sendMagic(victim);
                 }
+                this.setDead();
                 this.worldObj.spawnParticle("splash", this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
             }
             else

@@ -15,8 +15,11 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.magic.Base;
+import knight37x.magic.VictimWithDrops;
+import knight37x.magic.entity.EntityDropParticle;
 import knight37x.magic.entity.EntityLightning;
 import net.minecraft.client.entity.EntityClientPlayerMP;
+import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -36,7 +39,10 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 public class ItemWand extends Item {
 	
-	public List<EntityLivingBase> victims = new ArrayList();
+	public List<VictimWithDrops> victims = new ArrayList();
+	public IIcon loading;
+	
+	public final static int COOLDOWN = 100;
 	
 	@Override
 	public void onCreated(ItemStack itemstack, World world, EntityPlayer player) {
@@ -56,6 +62,7 @@ public class ItemWand extends Item {
 	@Override
 	public void registerIcons(IIconRegister reg) {
 		super.registerIcons(reg);
+		this.loading = reg.registerIcon("magic:wand_loading");
 	}
 
 	@Override
@@ -81,16 +88,34 @@ public class ItemWand extends Item {
 //				e.setPosition(e.lastTickPosX, e.lastTickPosY, e.lastTickPosZ);
 //			}
 //		}
-		ArrayList<Integer> rm = new ArrayList();
-		for(EntityLivingBase e : victims) {
+//		ArrayList<Integer> rm = new ArrayList();
+//		for(EntityLivingBase e : victims) {
+//			if(e == null || e.isDead) {
+//				rm.add(victims.indexOf(e));
+//			} else {
+//				e.setPosition(e.lastTickPosX, e.lastTickPosY, e.lastTickPosZ);
+//			}
+//		}
+//		for(int i : rm) {
+//			victims.remove(i);
+//		}
+		Iterator<VictimWithDrops> it = victims.iterator();
+		while(it.hasNext()) {
+			VictimWithDrops map = it.next();
+			EntityLivingBase e = map.getVictim();
 			if(e == null || e.isDead) {
-				rm.add(victims.indexOf(e));
+				if(map.getDrops() != null) {
+					for(EntityFX i : map.getDrops()) {
+						if(i != null && i instanceof EntityDropParticle) {
+							((EntityDropParticle) i).victim = null;
+						}
+						i.setDead();
+					}
+				}
+				it.remove();
 			} else {
 				e.setPosition(e.lastTickPosX, e.lastTickPosY, e.lastTickPosZ);
 			}
-		}
-		for(int i : rm) {
-			victims.remove(i);
 		}
 	}
 
@@ -106,9 +131,12 @@ public class ItemWand extends Item {
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 		if(StaticMethods.isRunningOnClient() && stack.stackTagCompound != null) {
 			NBTTagCompound tag = stack.stackTagCompound;
-			int cooldown = tag.getInteger("cooldown");
-			if(cooldown <= 0) {
+			if((tag.getInteger("cooldown") <= 0 && tag.getInteger("storage") > 0) || player.capabilities.isCreativeMode) {
 				this.sendSpawnLightning((EntityClientPlayerMP) player, false);
+				if(!player.capabilities.isCreativeMode) {
+					tag.setInteger("cooldown", COOLDOWN);
+					tag.setInteger("storage", tag.getInteger("storage") - 1);
+				}
 			}
 		}
 		return stack;
@@ -122,5 +150,21 @@ public class ItemWand extends Item {
 		data.writeBoolean(forced);
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 		Lance.packetHandler.sendToServer(packet);
+	}
+
+	@Override
+	public IIcon getIconIndex(ItemStack stack) {
+		NBTTagCompound tag = stack.stackTagCompound;
+		return tag != null && tag.hasKey("cooldown") ? tag.getInteger("cooldown") <= 0 ? this.itemIcon : this.loading : this.itemIcon;
+	}
+
+	@Override
+	public IIcon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining) {
+		return this.getIconIndex(stack);
+	}
+
+	@Override
+	public IIcon getIcon(ItemStack stack, int pass) {
+		return this.getIconIndex(stack);
 	}
 }

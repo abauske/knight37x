@@ -55,7 +55,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				PacketHandler.handlers.get(packetID).handle(payload, packetID);
 			} catch(Exception e) {
 				e.printStackTrace();
-				System.out.println("problem");
+//				System.out.println("problem");
 			}
 		}
 	}

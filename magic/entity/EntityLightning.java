@@ -9,6 +9,7 @@ import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.magic.Base;
+import knight37x.magic.VictimWithDrops;
 import knight37x.magic.items.ItemWand;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
@@ -86,7 +87,7 @@ public class EntityLightning extends EntityThrowable {
 		if(StaticMethods.isRunningOnServer()) {
 			StaticMethods.out("server");
 			if(pos.typeOfHit == MovingObjectType.ENTITY && pos.entityHit instanceof EntityLivingBase) {
-				((ItemWand) Base.wand).victims.add((EntityLivingBase) pos.entityHit);
+				((ItemWand) Base.wand).victims.add(new VictimWithDrops((EntityLivingBase) pos.entityHit, null));
 				ByteBuf data = buffer(4);
 				data.writeInt(Base.magicPacketID);
 				data.writeInt(pos.entityHit.getEntityId());

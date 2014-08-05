@@ -11,6 +11,8 @@ import knight37x.magic.render.RenderLightning;
 import knight37x.magic.render.RenderLightningParticle;
 import knight37x.magic.render.RenderMagic;
 import knight37x.magic.render.RenderMana;
+import knight37x.magic.render.RenderTrainingLance;
+import knight37x.magic.render.RenderTrainingLanceUp;
 import knight37x.magic.render.RenderTroll;
 import cpw.mods.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.client.IItemRenderer;
@@ -21,6 +23,9 @@ public class MagicClientProxy extends MagicCommonProxy {
 	@Override
 	public void registerRenderers() {
 		MinecraftForgeClient.registerItemRenderer(Base.mana, (IItemRenderer) new RenderMana());
+
+		MinecraftForgeClient.registerItemRenderer(Base.training_lance, (IItemRenderer) new RenderTrainingLance());
+		MinecraftForgeClient.registerItemRenderer(Base.training_lance_up, (IItemRenderer) new RenderTrainingLanceUp());
 		
 		RenderingRegistry.registerEntityRenderingHandler(EntityTroll.class, new RenderTroll(new ModelTroll(), 0.6F));
 		RenderingRegistry.registerEntityRenderingHandler(EntityLightningParticle.class, new RenderLightningParticle());
@@ -29,6 +34,10 @@ public class MagicClientProxy extends MagicCommonProxy {
 //		
 //		RenderingRegistry.registerEntityRenderingHandler(EntityPlayer.class, new RenderCustomPlayer(new ModelPlayerFlying()));
     }
+	
+	public int addArmor(String armor){
+		return RenderingRegistry.addNewArmourRendererPrefix(armor);
+	}
 
 	@Override
 	public void registerSound() {
