@@ -15,6 +15,7 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -106,11 +107,18 @@ public class NetworkMsg extends NetworkBase {
 			((ItemWand) Base.wand).victims.add(new VictimWithDrops(e, list));
 		} else if(packetID == Base.magicSuccedPacketID) {
 			EntityLivingBase e = (EntityLivingBase) world.getEntityByID(msg.readInt());
+			world.spawnEntityInWorld(new EntityLightningBolt(world, e.posX, e.posY, e.posZ));
 			e.attackEntityFrom(DamageSource.magic, e.getHealth() + 1);
 		} else if(packetID == Base.trainingLancePacketID) {
 			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
 			Entity entity = ItemLance.getRightEntity(world, msg.readInt());
 			entity.ridingEntity = null;
+		} else if(packetID == Base.trollArmStatePacketID) {
+			Entity entity = world.getEntityByID(msg.readInt());
+			float armState = msg.readFloat();
+			if(entity != null) {
+				entity.getEntityData().setFloat("armState", armState);
+			}
 		}
 	}
 

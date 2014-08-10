@@ -65,6 +65,7 @@ public class Base {
 	public static int magicPacketID = 5;
 	public static int magicSuccedPacketID = 6;
 	public static int trainingLancePacketID = 7;
+	public static int trollArmStatePacketID = 8;
 	
 	// All Variables:
 	public static Item mana;
@@ -104,7 +105,7 @@ public class Base {
 		training_leggings = (ItemTrainingArmor) new ItemTrainingArmor(trainingsMaterial, 0, 2).setUnlocalizedName("training_leggins").setTextureName("magic:training_leggings").setCreativeTab(Lance.tabLance);
 		training_boots = (ItemTrainingArmor) new ItemTrainingArmor(trainingsMaterial, 0, 3).setUnlocalizedName("training_boots").setTextureName("magic:training_boots").setCreativeTab(Lance.tabLance);
 		
-		mana_block = new BlockMana(Material.glass).setBlockName("mana_block").setBlockTextureName("magic:mana_block").setCreativeTab(Lance.tabLance).setHardness(1.0F).setLightLevel(100).setLightOpacity(100).setResistance(1.0F);
+		mana_block = new BlockMana(Material.glass).setBlockName("mana_block").setBlockTextureName("magic:mana_block").setCreativeTab(Lance.tabLance).setHardness(1.0F).setLightLevel(0.9375F).setResistance(1.0F);
 		
 		registerItems();
 	}
@@ -128,12 +129,16 @@ public class Base {
 			trainingLancePacketID = PacketHandler.getFreePacketID();
 			PacketHandler.registerHandler(trainingLancePacketID, packetHandler);
 		}
+		if(!PacketHandler.registerHandler(trollArmStatePacketID, packetHandler)) {
+			trollArmStatePacketID = PacketHandler.getFreePacketID();
+			PacketHandler.registerHandler(trollArmStatePacketID, packetHandler);
+		}
 		
 		FMLCommonHandler.instance().bus().register(this.eventHandler);
 		
 		EntityRegistry.registerModEntity(EntityTroll.class, "EntityTroll", 0, this, 80, 1, true);
 		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
-		EntityRegistry.addSpawn(EntityTroll.class, 30, 1, 2, EnumCreatureType.monster, BiomeGenBase.plains, BiomeGenBase.desert);
+		EntityRegistry.addSpawn(EntityTroll.class, 300, 1, 2, EnumCreatureType.monster, BiomeGenBase.plains, BiomeGenBase.desert);
 		
 		trainingsMaterial.customCraftingMaterial = Item.getItemFromBlock(Blocks.wool);
 

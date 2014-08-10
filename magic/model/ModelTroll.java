@@ -1,5 +1,6 @@
 package knight37x.magic.model;
 
+import knight37x.magic.render.RenderTroll;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.entity.Entity;
@@ -130,10 +131,16 @@ public class ModelTroll extends ModelBase {
 		this.LeftEar.rotateAngleX = par5 / (180F / (float)Math.PI);
 		this.Nose.rotateAngleY = par4 / (180F / (float)Math.PI);
 		this.Nose.rotateAngleX = par5 / (180F / (float)Math.PI);
-		this.RightArm.rotateAngleX = MathHelper.cos(par1 * 0.6662F + (float)Math.PI) * 2.0F * par2 * 0.5F;
-		this.LeftArm.rotateAngleX = MathHelper.cos(par1 * 0.6662F) * 2.0F * par2 * 0.5F;
-		this.RightArm.rotateAngleZ = 0.0F;
+		
+		float f = entity.getEntityData().getFloat("armState");
+		if(f == 0) {
+			f = -MathHelper.cos(par1 * 0.6662F + (float)Math.PI) * 2.0F * par2 * 0.5F;
+		}
+		this.LeftArm.rotateAngleX = f;
 		this.LeftArm.rotateAngleZ = 0.0F;
+		
+		this.RightArm.rotateAngleX = MathHelper.cos(par1 * 0.6662F) * 2.0F * par2 * 0.5F;
+		this.RightArm.rotateAngleZ = 0.0F;
 		this.RightLeg.rotateAngleX = MathHelper.cos(par1 * 0.6662F) * 1.4F * par2;
 		this.LeftLeg.rotateAngleX = MathHelper.cos(par1 * 0.6662F + (float)Math.PI) * 1.4F * par2;
 		this.RightFoot.rotateAngleX = MathHelper.cos(par1 * 0.6662F) * 1.4F * par2;
@@ -142,6 +149,7 @@ public class ModelTroll extends ModelBase {
 		this.LeftLeg.rotateAngleY = 0.0F;
 		this.RightFoot.rotateAngleY = 0.0F;
 		this.LeftFoot.rotateAngleY = 0.0F;
+		RenderTroll.HAMMER_MODEL.setRotationAngles(par1, par2, f2, par4, par5, f5, entity);
 	}
 
 }

@@ -2,6 +2,7 @@ package knight37x.magic.entity;
 
 import knight37x.lance.StaticMethods;
 import knight37x.magic.Base;
+import knight37x.magic.TrollDamage;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.EntityLiving;
@@ -15,6 +16,7 @@ import net.minecraft.entity.ai.EntityAIMoveThroughVillage;
 import net.minecraft.entity.ai.EntityAIMoveTowardsRestriction;
 import net.minecraft.entity.ai.EntityAIMoveTowardsTarget;
 import net.minecraft.entity.ai.EntityAINearestAttackableTarget;
+import net.minecraft.entity.ai.EntityAISwimming;
 import net.minecraft.entity.ai.EntityAIWander;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.monster.IMob;
@@ -39,7 +41,8 @@ public class EntityTroll extends EntityCreature {
 	public EntityTroll(World world) {
 		super(world);
 		this.setSize(1.4F, 1.9F);
-		this.tasks.addTask(1, new EntityAIAttackOnCollide(this, 1.0D, true));
+		this.tasks.addTask(1, new EntityAISwimming(this));
+		this.tasks.addTask(1, new EntityAIAttackOnCollideTroll(this, 1.0D, true));
         this.tasks.addTask(2, new EntityAIMoveTowardsTarget(this, 0.9D, 32.0F));
         this.tasks.addTask(3, new EntityAIMoveThroughVillage(this, 0.6D, true));
         this.tasks.addTask(4, new EntityAIMoveTowardsRestriction(this, 1.0D));
@@ -47,8 +50,11 @@ public class EntityTroll extends EntityCreature {
         this.tasks.addTask(7, new EntityAIWatchClosest(this, EntityPlayer.class, 6.0F));
         this.tasks.addTask(8, new EntityAILookIdle(this));
         this.targetTasks.addTask(1, new EntityAIDefendVillage(this));
-        this.targetTasks.addTask(2, new EntityAIHurtByTarget(this, false));
-        this.targetTasks.addTask(3, new EntityAINearestAttackableTarget(this, EntityLiving.class, 0, false, true, IMob.mobSelector));
+        this.targetTasks.addTask(2, new EntityAINearestAttackableTarget(this, EntityPlayer.class, 0, true));
+        this.targetTasks.addTask(3, new EntityAIHurtByTarget(this, false));
+        this.targetTasks.addTask(4, new EntityAINearestAttackableTarget(this, EntityLiving.class, 0, false, true, IMob.mobSelector));
+        
+        this.getEntityData().setInteger("armState", 0);
 	}
 	
     protected void applyEntityAttributes() {
@@ -59,6 +65,8 @@ public class EntityTroll extends EntityCreature {
     
     @Override
     protected void updateAITick() {
+    	this.limbSwing = 0.5F;
+    	this.limbSwingAmount = 5;
 //    	this.setDead();
 //    	StaticMethods.out("living");
         if (--this.homeCheckTimer <= 0) {
@@ -83,12 +91,21 @@ public class EntityTroll extends EntityCreature {
     
     @Override
     public boolean attackEntityAsMob(Entity par1Entity) {
+//    	if(StaticMethods.isRunningOnClient()) {
+//    		StaticMethods.out("Client");
+//    	} else {
+//    		StaticMethods.out("Server");
+//    	}
+    	
         this.worldObj.setEntityState(this, (byte)4);
-        boolean flag = par1Entity.attackEntityFrom(DamageSource.causeMobDamage(this), (float)(7 + this.rand.nextInt(15)));
+        boolean flag = par1Entity.attackEntityFrom(new TrollDamage("troll", this), (float)(1 + this.rand.nextInt(7)));
 
         if (flag)
         {
-            par1Entity.motionY += 0.4000000059604645D;
+            par1Entity.posY -= 0.5F;
+            par1Entity.motionX = 0;
+            par1Entity.motionY = 0;
+            par1Entity.motionZ = 0;
         }
 
 //        this.playSound("mob.irongolem.throw", 1.0F, 1.0F);
@@ -150,7 +167,6 @@ public class EntityTroll extends EntityCreature {
 
 	@Override
 	public int getMaxSpawnedInChunk() {
-		// TODO Auto-generated method stub
 		return super.getMaxSpawnedInChunk();
 	}
 
@@ -173,12 +189,17 @@ public class EntityTroll extends EntityCreature {
 	
 	@Override
     public boolean getCanSpawnHere() {
-		if(worldObj.villageCollectionObj.getVillageList().iterator().hasNext() && worldObj.villageCollectionObj.findNearestVillage((int)this.posX, (int)this.posY, (int)this.posZ, 10) == null) {
-			return false;
-        } else if(!this.worldObj.canBlockSeeTheSky((int) this.posX, (int) this.posY, (int) this.posZ)) {
-        	return false;
-        }
-		return true;
+		if(worldObj.villageCollectionObj.getVillageList().iterator().hasNext()) {
+			Village v = worldObj.villageCollectionObj.findNearestVillage((int)this.posX, (int)this.posY, (int)this.posZ, 5);
+			if(v != null) {
+				ChunkCoordinates c = v.getCenter();
+				if(this.getDistance(c.posX, c.posY, c.posZ) < 20) {
+					return true;
+				}
+			}
+		}
+		this.setDead();
+		return false;
     }
 
 	@Override
