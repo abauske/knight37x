@@ -68,7 +68,7 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "lance", name = "Lance Mod", version = "2.5.1.172")
+@Mod(modid = "lance", name = "Lance Mod", version = "2.6.0.172")
 public class Lance {
 	
 	@Instance("lance")

@@ -37,6 +37,7 @@ public class EntityTroll extends EntityCreature {
 	private int homeCheckTimer;
 	Village villageObj;
 	public InventoryTroll inv = new InventoryTroll(this);
+	public static int spawnReducer = 20;
 	
 	public EntityTroll(World world) {
 		super(world);
@@ -60,7 +61,7 @@ public class EntityTroll extends EntityCreature {
     protected void applyEntityAttributes() {
         super.applyEntityAttributes();
         this.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(20.0D);
-        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.4D);
+        this.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.3D);
     }
     
     @Override
@@ -80,7 +81,6 @@ public class EntityTroll extends EntityCreature {
                 this.setHomeArea(chunkcoordinates.posX, chunkcoordinates.posY, chunkcoordinates.posZ, (int)((float)this.villageObj.getVillageRadius() * 0.6F));
             }
         }
-
         super.updateAITick();
     }
     
@@ -145,8 +145,6 @@ public class EntityTroll extends EntityCreature {
             }
         }
         
-        StaticMethods.out("drop");
-        
         int j = this.rand.nextInt(5);
         switch(j) {
         case 0: this.dropItem(Items.carrot, 1);
@@ -193,8 +191,16 @@ public class EntityTroll extends EntityCreature {
 			Village v = worldObj.villageCollectionObj.findNearestVillage((int)this.posX, (int)this.posY, (int)this.posZ, 5);
 			if(v != null) {
 				ChunkCoordinates c = v.getCenter();
-				if(this.getDistance(c.posX, c.posY, c.posZ) < 20) {
-					return true;
+				double dist = this.getDistance(c.posX, c.posY, c.posZ);
+				if(dist < 40) {
+					if(spawnReducer <= 0) {
+						StaticMethods.out("spawn");
+						spawnReducer = 20;
+						return true;
+					} else {
+						StaticMethods.out("No Spawn");
+						spawnReducer--;
+					}
 				}
 			}
 		}

@@ -35,7 +35,7 @@ public class MagicParticles {
 					entity.setVelocity(0, 0, 0);
 				} else if (particleName.equals("Drop")) {
 					entity = new EntityDropParticle(world, par2, par4, par6, Material.water);
-//					entity.setVelocity(0, 0, 0);
+					entity.setVelocity(0, 0, 0);
 				}
 
 				mc.effectRenderer.addEffect((EntityFX) entity);

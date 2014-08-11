@@ -61,9 +61,9 @@ public class Base {
 	public final static ArmorMaterial trainingsMaterial =  EnumHelper.addArmorMaterial("WOOL", 30, new int[]{1, 1, 1, 1}, 0);
 	
 	//-----------------------------------------------------------
-	public static int lightningPacketID = 4;
-	public static int magicPacketID = 5;
-	public static int magicSuccedPacketID = 6;
+	public static int spawnLightningPacketID = 4;
+	public static int spawnDropsPacketID = 5;
+	public static int mirrorUsePacketID = 6;
 	public static int trainingLancePacketID = 7;
 	public static int trollArmStatePacketID = 8;
 	
@@ -113,17 +113,17 @@ public class Base {
 	@EventHandler
 	public void load(FMLInitializationEvent event) {
 		NetworkMsg packetHandler = new NetworkMsg();
-		if(!PacketHandler.registerHandler(lightningPacketID, packetHandler)) {
-			lightningPacketID = PacketHandler.getFreePacketID();
-			PacketHandler.registerHandler(lightningPacketID, packetHandler);
+		if(!PacketHandler.registerHandler(spawnLightningPacketID, packetHandler)) {
+			spawnLightningPacketID = PacketHandler.getFreePacketID();
+			PacketHandler.registerHandler(spawnLightningPacketID, packetHandler);
 		}
-		if(!PacketHandler.registerHandler(magicPacketID, packetHandler)) {
-			magicPacketID = PacketHandler.getFreePacketID();
-			PacketHandler.registerHandler(magicPacketID, packetHandler);
+		if(!PacketHandler.registerHandler(spawnDropsPacketID, packetHandler)) {
+			spawnDropsPacketID = PacketHandler.getFreePacketID();
+			PacketHandler.registerHandler(spawnDropsPacketID, packetHandler);
 		}
-		if(!PacketHandler.registerHandler(magicSuccedPacketID, packetHandler)) {
-			magicSuccedPacketID = PacketHandler.getFreePacketID();
-			PacketHandler.registerHandler(magicSuccedPacketID, packetHandler);
+		if(!PacketHandler.registerHandler(mirrorUsePacketID, packetHandler)) {
+			mirrorUsePacketID = PacketHandler.getFreePacketID();
+			PacketHandler.registerHandler(mirrorUsePacketID, packetHandler);
 		}
 		if(!PacketHandler.registerHandler(trainingLancePacketID, packetHandler)) {
 			trainingLancePacketID = PacketHandler.getFreePacketID();
@@ -138,11 +138,9 @@ public class Base {
 		
 		EntityRegistry.registerModEntity(EntityTroll.class, "EntityTroll", 0, this, 80, 1, true);
 		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
-		EntityRegistry.addSpawn(EntityTroll.class, 300, 1, 2, EnumCreatureType.monster, BiomeGenBase.plains, BiomeGenBase.desert);
+		EntityRegistry.addSpawn(EntityTroll.class, 100, 1, 1, EnumCreatureType.ambient, BiomeGenBase.plains, BiomeGenBase.desert);
 		
 		trainingsMaterial.customCraftingMaterial = Item.getItemFromBlock(Blocks.wool);
-
-//		EntityRegistry.registerModEntity(EntityMagic.class, "EntityMagic", 1, this, 80, 1, true);
 		
 		registerRecipes();
 		proxy.registerRenderers();
@@ -157,6 +155,7 @@ public class Base {
 	private void registerRecipes() {
 		GameRegistry.addRecipe(new LoadingRecipe());
 		GameRegistry.addShapedRecipe(new ItemStack(wand, 1), "M", "D", "S", 'M', mana_block, 'D', Items.diamond, 'S', Items.stick);
+		GameRegistry.addRecipe(new ItemStack(mirror), "III", "I#I", " G ", 'I', Items.iron_ingot, '#', Blocks.glass_pane, 'G', Items.gold_ingot);
 		GameRegistry.addRecipe(new ItemStack(mana_block), "###", "###", "###", '#', mana_block);
 		
 		GameRegistry.addRecipe(new TrainingLanceRecipe());

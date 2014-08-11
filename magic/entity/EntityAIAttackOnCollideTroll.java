@@ -157,15 +157,20 @@ public class EntityAIAttackOnCollideTroll extends EntityAIBase {
 					((EntityCreature) entity).setRevengeTarget(this.attacker);
 				}
 			}
+			
+			if(this.attackTick == -10) {
+				this.attacker.getEntityData().setFloat("armState", -0.75F);
+				this.sendArmState(this.attacker, -0.75F);
+			} else {
+				this.attacker.getEntityData().setFloat("armState", (float) (0F - this.attackTick * 0.075));
+				this.sendArmState(this.attacker, (float) (0F - this.attackTick * 0.075));
+			}
+		} else {
+			this.attacker.getEntityData().setFloat("armState", 0.0F);
+			this.sendArmState(this.attacker, 0.0F);
 		}
 //		StaticMethods.out(this.attackTick);
-		if(this.attackTick == -10) {
-			this.attacker.getEntityData().setFloat("armState", -0.75F);
-			this.sendArmState(this.attacker, -0.75F);
-		} else {
-			this.attacker.getEntityData().setFloat("armState", (float) (0F - this.attackTick * 0.075));
-			this.sendArmState(this.attacker, (float) (0F - this.attackTick * 0.075));
-		}
+		
 		if(this.attackTick < 20 && this.attackTick >= 0) {
 			this.attackTick++;
 		}

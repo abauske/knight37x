@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -39,7 +40,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 
 public class ItemWand extends Item {
 	
-	public List<VictimWithDrops> victims = new ArrayList();
 	public IIcon loading;
 	
 	public final static int COOLDOWN = 100;
@@ -78,45 +78,6 @@ public class ItemWand extends Item {
 		if(tag.getInteger("cooldown") > 0) {
 			tag.setInteger("cooldown", tag.getInteger("cooldown") - 1);
 		}
-		
-//		Iterator<EntityLivingBase> it = victims.iterator();
-//		while(it.hasNext()) {
-//			EntityLivingBase e = it.next();
-//			if(e == null || e.isDead) {
-//				it.remove();
-//			} else {
-//				e.setPosition(e.lastTickPosX, e.lastTickPosY, e.lastTickPosZ);
-//			}
-//		}
-//		ArrayList<Integer> rm = new ArrayList();
-//		for(EntityLivingBase e : victims) {
-//			if(e == null || e.isDead) {
-//				rm.add(victims.indexOf(e));
-//			} else {
-//				e.setPosition(e.lastTickPosX, e.lastTickPosY, e.lastTickPosZ);
-//			}
-//		}
-//		for(int i : rm) {
-//			victims.remove(i);
-//		}
-		Iterator<VictimWithDrops> it = victims.iterator();
-		while(it.hasNext()) {
-			VictimWithDrops map = it.next();
-			EntityLivingBase e = map.getVictim();
-			if(e == null || e.isDead) {
-				if(map.getDrops() != null) {
-					for(EntityFX i : map.getDrops()) {
-						if(i != null && i instanceof EntityDropParticle) {
-							((EntityDropParticle) i).victim = null;
-						}
-						i.setDead();
-					}
-				}
-				it.remove();
-			} else {
-				e.setPosition(e.lastTickPosX, e.lastTickPosY, e.lastTickPosZ);
-			}
-		}
 	}
 
 	@Override
@@ -145,7 +106,7 @@ public class ItemWand extends Item {
 	@SubscribeEvent(priority = EventPriority.NORMAL)
     public void sendSpawnLightning(EntityClientPlayerMP player, boolean forced) {
 		ByteBuf data = buffer(4);
-		data.writeInt(Base.lightningPacketID);
+		data.writeInt(Base.spawnLightningPacketID);
 		data.writeInt(player.getEntityId());
 		data.writeBoolean(forced);
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");

@@ -150,9 +150,10 @@ public class EntityLightning extends EntityThrowable {
 	protected void onImpact(MovingObjectPosition pos) {
 		if(StaticMethods.isRunningOnServer()) {
 			if(pos.typeOfHit == MovingObjectType.ENTITY && pos.entityHit instanceof EntityLivingBase) {
-				((ItemWand) Base.wand).victims.add(new VictimWithDrops((EntityLivingBase) pos.entityHit, null));
+				this.worldObj.spawnEntityInWorld(new EntityDrop(this.worldObj, (EntityLivingBase) pos.entityHit));
+				this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "liquid.swim", 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
 				ByteBuf data = buffer(4);
-				data.writeInt(Base.magicPacketID);
+				data.writeInt(Base.spawnDropsPacketID);
 				data.writeInt(pos.entityHit.getEntityId());
 				FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 				Lance.packetHandler.sendToAll(packet);

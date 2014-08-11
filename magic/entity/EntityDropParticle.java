@@ -28,8 +28,8 @@ public class EntityDropParticle extends EntityDropParticleFX {
 	private Material materialType;
     /** The height of the current bob */
     private int bobTimer;
-    public static EntityLivingBase lastTickVictim = null;
-    public static EntityLivingBase victim = null;
+    public EntityLivingBase lastTickVictim = null;
+    public EntityLivingBase victim = null;
 
     public EntityDropParticle(World par1World, double par2, double par4, double par6, Material material)
     {
@@ -61,6 +61,7 @@ public class EntityDropParticle extends EntityDropParticleFX {
     public EntityDropParticle(World world, double d, double e, double f, Material water, EntityLivingBase victim) {
 		this(world, d, e, f, water);
 		this.victim = victim;
+		this.setPosition(victim.posX, victim.posY, victim.posZ);
 	}
 
 	public int getBrightnessForRender(float par1)
@@ -75,107 +76,107 @@ public class EntityDropParticle extends EntityDropParticleFX {
     {
         return this.materialType == Material.water ? super.getBrightness(par1) : 1.0F;
     }
-
-    /**
-     * Called to update the entity's position/logic.
-     */
-    public void onUpdate()
-    {
-    	if(this.victim != null) {
-        	StaticMethods.out(this.victim.getEntityId());
-    	}
-    	if(victim != lastTickVictim && lastTickVictim != null && !lastTickVictim.isDead) {
-    		 for(VictimWithDrops v : ((ItemWand) Base.wand).victims) {
-    			 if(v.getVictim() == lastTickVictim) {
-    				 this.sendMagic(lastTickVictim);
-    				 break;
-    			 }
-    		 }
-    	}
-    	if(victim != null) {
-        	lastTickVictim = victim;
-    	}
-    	
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-
-        if (this.materialType == Material.water)
-        {
-            this.particleRed = 0.2F;
-            this.particleGreen = 0.3F;
-            this.particleBlue = 1.0F;
-        }
-        else
-        {
-            this.particleRed = 1.0F;
-            this.particleGreen = 16.0F / (float)(40 - this.bobTimer + 16);
-            this.particleBlue = 4.0F / (float)(40 - this.bobTimer + 8);
-        }
-
-        this.motionY -= (double)this.particleGravity;
-
-        if (this.bobTimer-- > 0)
-        {
-            this.motionX *= 0.02D;
-            this.motionY *= 0.02D;
-            this.motionZ *= 0.02D;
-            this.setParticleTextureIndex(113);
-        }
-        else
-        {
-            this.setParticleTextureIndex(112);
-        }
-
-        this.moveEntity(this.motionX, this.motionY, this.motionZ);
-        this.motionX *= 0.9800000190734863D;
-        this.motionY *= 0.9800000190734863D;
-        this.motionZ *= 0.9800000190734863D;
-
-        if (this.particleMaxAge-- <= 0)
-        {
-            this.setDead();
-        }
-
-        if (this.onGround)
-        {
-            if (this.materialType == Material.water)
-            {
-                if(this.victim != null && !this.isDead) {
-                	this.sendMagic(victim);
-                }
-                this.setDead();
-                this.worldObj.spawnParticle("splash", this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
-            }
-            else
-            {
-                this.setParticleTextureIndex(114);
-            }
-
-            this.motionX *= 0.699999988079071D;
-            this.motionZ *= 0.699999988079071D;
-        }
-
-        Material material = this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)).getMaterial();
-
-        if (material.isLiquid() || material.isSolid())
-        {
-            double d0 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockLiquid.getLiquidHeightPercent(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
-
-            if (this.posY < d0)
-            {
-                this.setDead();
-            }
-        }
-    }
-    
-    private void sendMagic(EntityLivingBase toKill) {
-    	if(!toKill.isDead) {
-        	ByteBuf data = buffer(4);
-    		data.writeInt(Base.magicSuccedPacketID);
-    		data.writeInt(toKill.getEntityId());
-    		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
-    		Lance.packetHandler.sendToServer(packet);
-    	}
-    }
 }
+//    /**
+//     * Called to update the entity's position/logic.
+//     */
+//    public void onUpdate()
+//    {
+//    	if(this.victim != null) {
+//        	StaticMethods.out(this.victim.getEntityId());
+//    	}
+//    	if(victim != lastTickVictim && lastTickVictim != null && !lastTickVictim.isDead) {
+//    		 for(VictimWithDrops v : ((ItemWand) Base.wand).victims) {
+//    			 if(v.getVictim() == lastTickVictim) {
+//    				 this.sendMagic(lastTickVictim);
+//    				 break;
+//    			 }
+//    		 }
+//    	}
+//    	if(victim != null) {
+//        	lastTickVictim = victim;
+//    	}
+//    	
+//        this.prevPosX = this.posX;
+//        this.prevPosY = this.posY;
+//        this.prevPosZ = this.posZ;
+//
+//        if (this.materialType == Material.water)
+//        {
+//            this.particleRed = 0.2F;
+//            this.particleGreen = 0.3F;
+//            this.particleBlue = 1.0F;
+//        }
+//        else
+//        {
+//            this.particleRed = 1.0F;
+//            this.particleGreen = 16.0F / (float)(40 - this.bobTimer + 16);
+//            this.particleBlue = 4.0F / (float)(40 - this.bobTimer + 8);
+//        }
+//
+//        this.motionY -= (double)this.particleGravity;
+//
+//        if (this.bobTimer-- > 0)
+//        {
+//            this.motionX *= 0.02D;
+//            this.motionY *= 0.02D;
+//            this.motionZ *= 0.02D;
+//            this.setParticleTextureIndex(113);
+//        }
+//        else
+//        {
+//            this.setParticleTextureIndex(112);
+//        }
+//
+//        this.moveEntity(this.motionX, this.motionY, this.motionZ);
+//        this.motionX *= 0.9800000190734863D;
+//        this.motionY *= 0.9800000190734863D;
+//        this.motionZ *= 0.9800000190734863D;
+//
+//        if (this.particleMaxAge-- <= 0)
+//        {
+//            this.setDead();
+//        }
+//
+//        if (this.onGround)
+//        {
+//            if (this.materialType == Material.water)
+//            {
+//                if(this.victim != null && !this.isDead) {
+//                	this.sendMagic(victim);
+//                }
+//                this.setDead();
+//                this.worldObj.spawnParticle("splash", this.posX, this.posY, this.posZ, 0.0D, 0.0D, 0.0D);
+//            }
+//            else
+//            {
+//                this.setParticleTextureIndex(114);
+//            }
+//
+//            this.motionX *= 0.699999988079071D;
+//            this.motionZ *= 0.699999988079071D;
+//        }
+//
+//        Material material = this.worldObj.getBlock(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ)).getMaterial();
+//
+//        if (material.isLiquid() || material.isSolid())
+//        {
+//            double d0 = (double)((float)(MathHelper.floor_double(this.posY) + 1) - BlockLiquid.getLiquidHeightPercent(this.worldObj.getBlockMetadata(MathHelper.floor_double(this.posX), MathHelper.floor_double(this.posY), MathHelper.floor_double(this.posZ))));
+//
+//            if (this.posY < d0)
+//            {
+//                this.setDead();
+//            }
+//        }
+//    }
+//    
+//    private void sendMagic(EntityLivingBase toKill) {
+//    	if(!toKill.isDead) {
+//        	ByteBuf data = buffer(4);
+//    		data.writeInt(Base.magicSuccedPacketID);
+//    		data.writeInt(toKill.getEntityId());
+//    		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
+//    		Lance.packetHandler.sendToServer(packet);
+//    	}
+//    }
+//}

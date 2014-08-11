@@ -17,6 +17,7 @@ import knight37x.lance.Lance;
 import knight37x.lance.StaticMethods;
 import knight37x.magic.Base;
 import knight37x.magic.VictimWithDrops;
+import knight37x.magic.entity.EntityDrop;
 import knight37x.magic.entity.EntityDropParticle;
 import knight37x.magic.entity.EntityLightning;
 import net.minecraft.block.Block;
@@ -45,38 +46,17 @@ public class ItemMirror extends ItemSword {
 	@Override
 	public ItemStack onItemRightClick(ItemStack stack, World world, EntityPlayer player) {
 		if(StaticMethods.isRunningOnClient()) {
-			Iterator<VictimWithDrops> it = ((ItemWand) Base.wand).victims.iterator();
-			while(it.hasNext()) {
-				VictimWithDrops v = it.next();
-				if(v.getVictim() == player) {
-					this.sendSpawnLightning((EntityClientPlayerMP) player, true);
-					if(v.getDrops() != null) {
-						for(EntityFX i : v.getDrops()) {
-							if(i != null && i instanceof EntityDropParticle) {
-								((EntityDropParticle) i).victim = null;
-							}
-							i.setDead();
-							world.removeEntity(i);
-						}
-					}
-					stack.damageItem(1, player);
-					if(stack.getItemDamage() >= stack.getMaxDamage()) {
-						stack.stackSize = 0;
-					}
-					it.remove();
-				}
-			}
+			this.mirrorUse(player);
 		}
 		super.onItemRightClick(stack, world, player);
 		return stack;
 	}
 
 	@SubscribeEvent(priority = EventPriority.NORMAL)
-    public void sendSpawnLightning(EntityClientPlayerMP player, boolean forced) {
+    public void mirrorUse(EntityPlayer player) {
 		ByteBuf data = buffer(4);
-		data.writeInt(Base.lightningPacketID);
+		data.writeInt(Base.mirrorUsePacketID);
 		data.writeInt(player.getEntityId());
-		data.writeBoolean(forced);
 		FMLProxyPacket packet = new FMLProxyPacket(data, "lance");
 		Lance.packetHandler.sendToServer(packet);
 	}
@@ -94,11 +74,6 @@ public class ItemMirror extends ItemSword {
 	
 	@Override
 	public boolean hitEntity(ItemStack par1ItemStack, EntityLivingBase par2EntityLivingBase, EntityLivingBase par3EntityLivingBase) {
-        return false;
-    }
-	
-	@Override
-	public boolean onBlockDestroyed(ItemStack p_150894_1_, World p_150894_2_, Block p_150894_3_, int p_150894_4_, int p_150894_5_, int p_150894_6_, EntityLivingBase p_150894_7_) {
         return false;
     }
 	

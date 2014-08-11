@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -39,7 +40,7 @@ import knight37x.lance.item.ItemLance;
 import knight37x.lance.network.NetworkBase;
 import knight37x.magic.entity.EntityDropParticle;
 import knight37x.magic.entity.EntityLightning;
-import knight37x.magic.entity.EntityMagic;
+import knight37x.magic.entity.EntityDrop;
 import knight37x.magic.entity.MagicParticles;
 import knight37x.magic.items.ItemWand;
 
@@ -51,7 +52,8 @@ public class NetworkMsg extends NetworkBase {
 		Minecraft mc = Minecraft.getMinecraft();
 		World world = mc.theWorld;
 		
-		if(packetID == Base.lightningPacketID) {
+		if(packetID == Base.spawnLightningPacketID) {
+			// Spawn Lightning for example when player uses Wand
 			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
 			Entity e = new EntityLightning(world, player);
 			world.spawnEntityInWorld(e);
@@ -60,60 +62,32 @@ public class NetworkMsg extends NetworkBase {
 			if(tag.getInteger("storage") > 0 && !player.capabilities.isCreativeMode) {
 				tag.setInteger("storage", tag.getInteger("storage") - 1);
 			}
-		} else if(packetID == Base.magicPacketID) {
+		} else if(packetID == Base.spawnDropsPacketID) {
+			// Spawn Drop Entity when lightning hits an entity
 			EntityLivingBase e = (EntityLivingBase) world.getEntityByID(msg.readInt());
-			List<EntityFX> list = new ArrayList();
-			if(e == mc.thePlayer) {
-				for(int i = 0; i < 91; i += 1) {
-					for(float j = -1.0F; j < 1.0F; j += 0.1F) {
-						if(j > 1.0F - 2 * 0.1F) {
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-						} else {
-							list.add(MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0));
-							list.add(MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0));
-							list.add(MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0));
-							list.add(MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0));
-						}
-					}
-				}
-			} else {
-				for(int i = 0; i < 91; i += 1) {
-					for(float j = 0.2F; j < e.getEyeHeight() + 0.5F; j += 0.1F) {
-						if(j > e.getEyeHeight() + 0.5F - 2 * 0.1F) {
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-							list.add(((EntityDropParticle) MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0)));
-							((EntityDropParticle) list.get(list.size() - 1)).victim = e;
-						} else {
-							list.add(MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0));
-							list.add(MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ + Math.sin(i), 0, 0, 0));
-							list.add(MagicParticles.spawnParticle("Drop", e.posX - Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0));
-							list.add(MagicParticles.spawnParticle("Drop", e.posX + Math.cos(i), e.posY + j, e.posZ - Math.sin(i), 0, 0, 0));
-						}
+			world.spawnEntityInWorld(new EntityDrop(world, e));
+		} else if(packetID == Base.mirrorUsePacketID) {
+			// Removes Drop Entity when player uses Mirror
+			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
+			for(Object o : world.loadedEntityList) {
+				if(o instanceof EntityDrop) {
+					EntityDrop e = (EntityDrop) o;
+					if(e.victim == player) {
+						e.victim = null;
+						e.setDead();
+						
+						Entity entity = new EntityLightning(world, player);
+						world.spawnEntityInWorld(entity);
+						break;
 					}
 				}
 			}
-			((ItemWand) Base.wand).victims.add(new VictimWithDrops(e, list));
-		} else if(packetID == Base.magicSuccedPacketID) {
-			EntityLivingBase e = (EntityLivingBase) world.getEntityByID(msg.readInt());
-			world.spawnEntityInWorld(new EntityLightningBolt(world, e.posX, e.posY, e.posZ));
-			e.attackEntityFrom(DamageSource.magic, e.getHealth() + 1);
 		} else if(packetID == Base.trainingLancePacketID) {
 			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
 			Entity entity = ItemLance.getRightEntity(world, msg.readInt());
 			entity.ridingEntity = null;
 		} else if(packetID == Base.trollArmStatePacketID) {
+			// Makes Troll use the hammer naturally
 			Entity entity = world.getEntityByID(msg.readInt());
 			float armState = msg.readFloat();
 			if(entity != null) {
@@ -127,41 +101,43 @@ public class NetworkMsg extends NetworkBase {
 		MinecraftServer server = MinecraftServer.getServer();
 		World world = server.getEntityWorld();
 		
-		if(packetID == Base.lightningPacketID) {
+		if(packetID == Base.spawnLightningPacketID) {
+			// Spawn Lightning for example when player uses Wand
 			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
 			
-			if(msg.readBoolean()) {
-				FMLProxyPacket packet = new FMLProxyPacket(msg, "lance");
-				Lance.packetHandler.sendToAll(packet);
-				
-				Entity entity = new EntityLightning(world, player);
-				world.spawnEntityInWorld(entity);
-			} else {
-				ItemStack stack = player.getCurrentEquippedItem();
-				if(stack != null && stack.getItem() == Base.wand && stack.stackTagCompound != null) {
-					NBTTagCompound tag = stack.stackTagCompound;
-					int st = tag.getInteger("storage");
-					if(st > 0 || player.capabilities.isCreativeMode) {
-						FMLProxyPacket packet = new FMLProxyPacket(msg, "lance");
-						Lance.packetHandler.sendToAll(packet);
-						
-						Entity entity = new EntityLightning(world, player);
-						world.spawnEntityInWorld(entity);
-						if(!player.capabilities.isCreativeMode) {
-							tag.setInteger("storage", st - 1);
-						}
+			ItemStack stack = player.getCurrentEquippedItem();
+			if(stack != null && stack.getItem() == Base.wand && stack.stackTagCompound != null) {
+				NBTTagCompound tag = stack.stackTagCompound;
+				int st = tag.getInteger("storage");
+				if(st > 0 || player.capabilities.isCreativeMode) {
+					FMLProxyPacket packet = new FMLProxyPacket(msg, "lance");
+					Lance.packetHandler.sendToAll(packet);
+					
+					Entity entity = new EntityLightning(world, player);
+					world.spawnEntityInWorld(entity);
+					if(!player.capabilities.isCreativeMode) {
+						tag.setInteger("storage", st - 1);
 					}
 				}
 			}
-		} else if(packetID == Base.magicSuccedPacketID) {
-			int id = msg.readInt();
-			Entity entity = world.getEntityByID(id);
-			if(entity != null && !entity.isDead) {
-				FMLProxyPacket packet = new FMLProxyPacket(msg, "lance");
-				Lance.packetHandler.sendToAll(packet);
-				
-				EntityLivingBase e = (EntityLivingBase) world.getEntityByID(id);
-				e.attackEntityFrom(DamageSource.magic, e.getHealth() + 1);
+		} else if(packetID == Base.mirrorUsePacketID) {
+			// Removes Drop Entity when player uses Mirror
+			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
+			Lance.packetHandler.sendToAll(clientmsg);
+			
+			EntityPlayer player = (EntityPlayer) world.getEntityByID(msg.readInt());
+			for(Object o : world.loadedEntityList) {
+				if(o instanceof EntityDrop) {
+					EntityDrop e = (EntityDrop) o;
+					if(e.victim == player) {
+						e.victim = null;
+						e.setDead();
+						
+						Entity entity = new EntityLightning(world, player);
+						world.spawnEntityInWorld(entity);
+						break;
+					}
+				}
 			}
 		} else if(packetID == Base.trainingLancePacketID) {
 			FMLProxyPacket clientmsg = new FMLProxyPacket(msg, "lance");
