@@ -166,6 +166,7 @@ public class Base {
 		GameRegistry.addShapedRecipe(new ItemStack(wand, 1), "M", "D", "S", 'M', mana_block, 'D', Items.diamond, 'S', Items.stick);
 		GameRegistry.addRecipe(new ItemStack(mirror), "III", "I#I", " G ", 'I', Items.iron_ingot, '#', Blocks.glass_pane, 'G', Items.gold_ingot);
 		GameRegistry.addRecipe(new ItemStack(mana_block), "###", "###", "###", '#', mana);
+		GameRegistry.addRecipe(new ItemStack(training_lance_up), "  X", " # ", "#  ", '#', Lance.shaft, 'X', Blocks.wool);
 		
 		GameRegistry.addRecipe(new TrainingLanceRecipe());
 		
