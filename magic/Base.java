@@ -19,6 +19,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -145,9 +146,10 @@ public class Base {
 		FMLCommonHandler.instance().bus().register(this.eventHandler);
 		MinecraftForge.EVENT_BUS.register(this.eventHandler);
 		
+		EntityRegistry.registerGlobalEntityID(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
 		EntityRegistry.registerModEntity(EntityTroll.class, "EntityTroll", 0, this, 80, 1, true);
-		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
-		EntityRegistry.addSpawn(EntityTroll.class, 2, 1, 1, EnumCreatureType.ambient, BiomeGenBase.plains, BiomeGenBase.desert);
+//		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
+		EntityRegistry.addSpawn(EntityTroll.class, 1, 1, 2, EnumCreatureType.monster, BiomeGenBase.plains, BiomeGenBase.desert);
 		
 		trainingsMaterial.customCraftingMaterial = Item.getItemFromBlock(Blocks.wool);
 		
