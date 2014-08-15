@@ -54,7 +54,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 				
 				PacketHandler.handlers.get(packetID).handle(payload, packetID);
 			} catch(Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 //				System.out.println("problem");
 			}
 		}
@@ -89,6 +89,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 		 * 10 -> Pass through: Lance state
 		 * 11 -> Pass through: Spear state
 		 * 12 -> Pass through: Bow state
+		 * 13 -> Lance Auto Update
 		 */
         BasicHandler handler = new BasicHandler();
 		PacketHandler.handlers.put(0, handler);
@@ -98,6 +99,7 @@ public class PacketHandler extends SimpleChannelInboundHandler<FMLProxyPacket> {
 		PacketHandler.handlers.put(10, handler);
 		PacketHandler.handlers.put(11, handler);
 		PacketHandler.handlers.put(12, handler);
+		PacketHandler.handlers.put(13, handler);
         
     }
 	

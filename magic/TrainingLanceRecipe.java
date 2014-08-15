@@ -46,13 +46,11 @@ public class TrainingLanceRecipe implements IRecipe {
 
 	@Override
 	public int getRecipeSize() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 10;
 	}
 
 	@Override
 	public ItemStack getRecipeOutput() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

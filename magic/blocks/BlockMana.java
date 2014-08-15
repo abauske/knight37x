@@ -12,6 +12,8 @@ import net.minecraft.block.BlockGlass;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemAxe;
+import net.minecraft.item.ItemPickaxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
@@ -26,6 +28,7 @@ public class BlockMana extends BlockBreakable
     {
         super("mana_block", material, false);
         this.setCreativeTab(CreativeTabs.tabBlock);
+        this.setHarvestLevel("pickaxe", 1);
     }
 
     @Override

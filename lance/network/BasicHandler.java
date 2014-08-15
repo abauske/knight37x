@@ -1,11 +1,19 @@
 package knight37x.lance.network;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
 
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import knight37x.lance.Lance;
+import knight37x.lance.LanceAutoUpdate;
+import knight37x.lance.Version;
 import knight37x.lance.block.ContainerBowConfig;
 import knight37x.lance.item.ItemLance;
 import knight37x.lance.item.ItemMayorBow;
@@ -83,6 +91,9 @@ public class BasicHandler extends NetworkBase {
 					}
 				}
 			}
+		} else if(packetID == 13) {
+			// Auto Update
+			LanceAutoUpdate.update();
 		}
 	}
 

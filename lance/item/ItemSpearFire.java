@@ -17,9 +17,9 @@ public class ItemSpearFire extends ItemSpear {
 	
 	@Override
 	public void onCreated(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer) {
-		System.out.println(par1ItemStack);
-		System.out.println(par2World);
-		System.out.println(par3EntityPlayer);
+//		System.out.println(par1ItemStack);
+//		System.out.println(par2World);
+//		System.out.println(par3EntityPlayer);
 	}
 	
 }

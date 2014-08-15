@@ -1,5 +1,11 @@
 package knight37x.lance;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Locale.Category;
 
@@ -58,6 +64,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
@@ -68,8 +75,12 @@ import cpw.mods.fml.common.registry.LanguageRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
-@Mod(modid = "lance", name = "Lance Mod", version = "2.6.0.172")
+@Mod(modid = Lance.modid, name = Lance.name, version = Lance.version)
 public class Lance {
+	
+	public static final String modid = "lance",
+			name = "Lance Mod",
+			version = "2.6.0.172";
 	
 	@Instance("lance")
 	public static Lance instance = new Lance();
@@ -88,6 +99,8 @@ public class Lance {
 			return Lance.lanceUpIron;
 		}
 	};
+	
+	public static Version newestVersion = null;
 	
 	//-----------------------------------------------------------
 	// All Variables:
@@ -213,6 +226,8 @@ public class Lance {
 		
 		FMLCommonHandler.instance().bus().register(this.eventHandler);
 		MinecraftForge.EVENT_BUS.register(this.eventHandler);
+		
+		this.newestVersion = Version.newVersion();
 
 		registerRecipes();
 		proxy.registerRenderers();
@@ -221,6 +236,21 @@ public class Lance {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		
+	}
+	
+	@EventHandler
+	public void serverStart(FMLServerStartingEvent event) {
+		ServerCommandManager manager = ((ServerCommandManager) MinecraftServer.getServer().getCommandManager());
+		manager.registerCommand(new LanceAutoUpdate());
+	}
+	
+	@EventHandler
+	public void serverStarted(FMLServerStartedEvent event) {
+		if(event.getSide() != Side.CLIENT) {
+			if(Lance.newestVersion != null && !Lance.newestVersion.isInstalledVersion()) {
+				System.out.println("Version " + Lance.newestVersion.getMCVersion() + " of Lance Mod here available: " + Lance.newestVersion.getDownloadURL());
+			}
+		}
 	}
 	
 	private void registerRecipes()

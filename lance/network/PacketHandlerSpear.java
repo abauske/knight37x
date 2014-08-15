@@ -46,7 +46,7 @@ public class PacketHandlerSpear extends SimpleChannelInboundHandler<FMLProxyPack
 				}
 			} catch(Exception e) {
 //				e.printStackTrace();
-				System.out.println("problem");
+//				System.out.println("problem");
 			}
 		}
 	}

@@ -7,6 +7,7 @@ import knight37x.lance.Lance;
 import knight37x.lance.item.ItemLanceUp;
 import knight37x.lance.network.NetworkBase;
 import knight37x.lance.network.PacketHandler;
+import knight37x.magic.blocks.BlockBarrier;
 import knight37x.magic.blocks.BlockMana;
 import knight37x.magic.entity.EntityTroll;
 import knight37x.magic.items.ItemEnderCannon;
@@ -23,6 +24,7 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
+import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.biome.BiomeCache;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -47,8 +49,12 @@ import cpw.mods.fml.common.registry.EntityRegistry;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.common.registry.LanguageRegistry;
 
-@Mod(modid = "lance_magic", name = "Magic Plugin", version = "1.0.0.172")
+@Mod(modid = Base.modid, name = Base.name, version = Base.version)
 public class Base {
+
+	public static final String modid = "lance_magic",
+			name = "Magic Plugin",
+			version = "1.0.0.172";
 	
 	@Instance("base")
 	public static Base instance = new Base();
@@ -81,6 +87,7 @@ public class Base {
 	public static ItemTrainingArmor training_boots;
 	
 	public static Block mana_block;
+	public static Block barrier;
 	
 	
 	//-----------------------------------------------------------
@@ -106,6 +113,7 @@ public class Base {
 		training_boots = (ItemTrainingArmor) new ItemTrainingArmor(trainingsMaterial, 0, 3).setUnlocalizedName("training_boots").setTextureName("magic:training_boots").setCreativeTab(Lance.tabLance);
 		
 		mana_block = new BlockMana(Material.glass).setBlockName("mana_block").setBlockTextureName("magic:mana_block").setCreativeTab(Lance.tabLance).setHardness(1.0F).setLightLevel(0.9375F).setResistance(1.0F);
+//		barrier = new BlockBarrier(Material.wood).setBlockName("barrier").setBlockTextureName("magic:barrier").setCreativeTab(Lance.tabLance);
 		
 		registerItems();
 	}
@@ -135,6 +143,7 @@ public class Base {
 		}
 		
 		FMLCommonHandler.instance().bus().register(this.eventHandler);
+		MinecraftForge.EVENT_BUS.register(this.eventHandler);
 		
 		EntityRegistry.registerModEntity(EntityTroll.class, "EntityTroll", 0, this, 80, 1, true);
 		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
@@ -178,5 +187,6 @@ public class Base {
 		GameRegistry.registerItem(training_leggings, "training_leggins");
 		
 		GameRegistry.registerBlock(mana_block, "mana_block");
+//		GameRegistry.registerBlock(barrier, "barrier");
 	}
 }

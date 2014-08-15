@@ -441,10 +441,6 @@ public abstract class ItemLance extends ItemSword {
         return extraDamage;
     }
 	
-	public static void print(Object object) {
-		System.out.println(object);
-	}
-	
 	public boolean attack(EntityLivingBase entity, EntityPlayer player, float value) {
 		return entity.attackEntityFrom(DamageSource.causePlayerDamage(player), value);
 	}

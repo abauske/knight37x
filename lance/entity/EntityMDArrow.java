@@ -176,7 +176,7 @@ public class EntityMDArrow extends EntityArrow {
                 {
                     f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
                     int k = MathHelper.ceiling_double_int((double)f2 * this.damage);
-                    StaticMethods.out(this.damage);
+//                    StaticMethods.out(this.damage);
 
                     if (this.getIsCritical())
                     {

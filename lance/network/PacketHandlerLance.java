@@ -32,7 +32,7 @@ public class PacketHandlerLance extends SimpleChannelInboundHandler<FMLProxyPack
 	protected void channelRead0(ChannelHandlerContext ctx, FMLProxyPacket packet) throws Exception {
 		if(packet.channel().equals("lance")) {
 			try {
-				System.out.println(StaticMethods.isRunningOnClient());
+//				System.out.println(StaticMethods.isRunningOnClient());
 				ByteBuf payload = packet.payload();
 				
 				payload.readInt();
@@ -58,8 +58,8 @@ public class PacketHandlerLance extends SimpleChannelInboundHandler<FMLProxyPack
 					
 				}
 			} catch(Exception e) {
-				e.printStackTrace();
-				System.out.println("problem");
+//				e.printStackTrace();
+//				System.out.println("problem");
 			}
 		}
 	}
