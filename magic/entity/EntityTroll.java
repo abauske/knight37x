@@ -37,7 +37,7 @@ public class EntityTroll extends EntityCreature {
 	private int homeCheckTimer;
 	Village villageObj;
 	public InventoryTroll inv = new InventoryTroll(this);
-	public static int spawnReducer = 30;
+	public static int spawnReducer = 20;
 	
 	public EntityTroll(World world) {
 		super(world);
@@ -195,7 +195,7 @@ public class EntityTroll extends EntityCreature {
 				if(dist < 40) {
 					if(spawnReducer <= 0) {
 //						StaticMethods.out("spawn");
-						spawnReducer = 30;
+						spawnReducer = 20;
 						return super.getCanSpawnHere();
 					} else {
 //						StaticMethods.out("No Spawn");
