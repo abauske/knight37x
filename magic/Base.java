@@ -147,7 +147,7 @@ public class Base {
 		
 		EntityRegistry.registerModEntity(EntityTroll.class, "EntityTroll", 0, this, 80, 1, true);
 		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
-		EntityRegistry.addSpawn(EntityTroll.class, 100, 1, 1, EnumCreatureType.ambient, BiomeGenBase.plains, BiomeGenBase.desert);
+		EntityRegistry.addSpawn(EntityTroll.class, 10, 1, 1, EnumCreatureType.ambient, BiomeGenBase.plains, BiomeGenBase.desert);
 		
 		trainingsMaterial.customCraftingMaterial = Item.getItemFromBlock(Blocks.wool);
 		

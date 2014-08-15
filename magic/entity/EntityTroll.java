@@ -188,19 +188,20 @@ public class EntityTroll extends EntityCreature {
 	@Override
     public boolean getCanSpawnHere() {
 		if(worldObj.villageCollectionObj.getVillageList().iterator().hasNext()) {
-			Village v = worldObj.villageCollectionObj.findNearestVillage((int)this.posX, (int)this.posY, (int)this.posZ, 5);
+			Village v = worldObj.villageCollectionObj.findNearestVillage((int)this.posX, (int)this.posY, (int)this.posZ, 20);
 			if(v != null) {
 				ChunkCoordinates c = v.getCenter();
 				double dist = this.getDistance(c.posX, c.posY, c.posZ);
-				if(dist < 40) {
-					if(spawnReducer <= 0) {
-//						StaticMethods.out("spawn");
-						spawnReducer = 20;
-						return super.getCanSpawnHere();
-					} else {
-//						StaticMethods.out("No Spawn");
-						spawnReducer--;
-					}
+				if(dist < 100) {
+					return super.getCanSpawnHere();
+//					if(spawnReducer <= 0) {
+////						StaticMethods.out("spawn");
+//						spawnReducer = 20;
+//						return super.getCanSpawnHere();
+//					} else {
+////						StaticMethods.out("No Spawn");
+//						spawnReducer--;
+//					}
 				}
 			}
 		}

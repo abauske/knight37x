@@ -282,11 +282,11 @@ public class Lance {
 //		GameRegistry.addRecipe(new ShapedOreRecipe(gold_sks, "#", "X", '#', Items.gunpowder, 'X', Items.golden_sword));
 //		GameRegistry.addRecipe(new ShapedOreRecipe(diamond_sks, "#", "X", '#', Items.gunpowder, 'X', Items.diamond_sword));
 		
-		GameRegistry.addRecipe(new ShapedOreRecipe(wood_sks, "#", "X", '#', Items.feather, 'X', Items.wooden_sword));
-		GameRegistry.addRecipe(new ShapedOreRecipe(stone_sks, "#", "X", '#', Items.feather, 'X', Items.stone_sword));
-		GameRegistry.addRecipe(new ShapedOreRecipe(iron_sks, "#", "X", '#', Items.feather, 'X', Items.iron_sword));
-		GameRegistry.addRecipe(new ShapedOreRecipe(gold_sks, "#", "X", '#', Items.feather, 'X', Items.golden_sword));
-		GameRegistry.addRecipe(new ShapedOreRecipe(diamond_sks, "#", "X", '#', Items.feather, 'X', Items.diamond_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(wood_sks, "#", "X", '#', Items.feather, 'X', Items.wooden_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(stone_sks, "#", "X", '#', Items.feather, 'X', Items.stone_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(iron_sks, "#", "X", '#', Items.feather, 'X', Items.iron_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(gold_sks, "#", "X", '#', Items.feather, 'X', Items.golden_sword));
+//		GameRegistry.addRecipe(new ShapedOreRecipe(diamond_sks, "#", "X", '#', Items.feather, 'X', Items.diamond_sword));
 		
 		//Rippers:
 		GameRegistry.addRecipe(new ShapedOreRecipe(diamondRipper, " # ", "# #", '#', Items.diamond));
