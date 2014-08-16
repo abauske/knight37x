@@ -42,6 +42,7 @@ import knight37x.magic.entity.EntityDropParticle;
 import knight37x.magic.entity.EntityLightning;
 import knight37x.magic.entity.EntityDrop;
 import knight37x.magic.entity.MagicParticles;
+import knight37x.magic.items.ItemTrainingLance;
 import knight37x.magic.items.ItemWand;
 
 public class NetworkMsg extends NetworkBase {

@@ -76,7 +76,8 @@ public class RecipeArmorDyes implements IRecipe {
         	}
         }
         if(armor != null && dye != null) {
-        	((ItemTrainingArmor) armor.getItem()).setColor(armor, ((ItemTrainingArmor) armor.getItem()).colors.getOrDefault(15 - dye.getItemDamage(), 0x555555));
+        	int color = ((ItemTrainingArmor) armor.getItem()).colors.containsKey(15 - dye.getItemDamage()) ? ((ItemTrainingArmor) armor.getItem()).colors.get(15 - dye.getItemDamage()) : 0x555555;
+        	((ItemTrainingArmor) armor.getItem()).setColor(armor, color);
         	return armor;
 		} else {
 			return null;

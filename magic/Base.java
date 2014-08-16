@@ -14,6 +14,8 @@ import knight37x.magic.items.ItemEnderCannon;
 import knight37x.magic.items.ItemMana;
 import knight37x.magic.items.ItemMirror;
 import knight37x.magic.items.ItemTrainingArmor;
+import knight37x.magic.items.ItemTrainingLance;
+import knight37x.magic.items.ItemTrainingLanceUp;
 import knight37x.magic.items.ItemWand;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -149,7 +151,7 @@ public class Base {
 		EntityRegistry.registerGlobalEntityID(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
 		EntityRegistry.registerModEntity(EntityTroll.class, "EntityTroll", 0, this, 80, 1, true);
 //		EntityList.addMapping(EntityTroll.class, "EntityTroll", 0, 0x4B6E3F, 0xE3DAC5);
-		EntityRegistry.addSpawn(EntityTroll.class, 1, 1, 2, EnumCreatureType.monster, BiomeGenBase.plains, BiomeGenBase.desert);
+		EntityRegistry.addSpawn(EntityTroll.class, 20, 1, 2, EnumCreatureType.monster, BiomeGenBase.plains, BiomeGenBase.desert);
 		
 		trainingsMaterial.customCraftingMaterial = Item.getItemFromBlock(Blocks.wool);
 		
@@ -168,9 +170,9 @@ public class Base {
 		GameRegistry.addShapedRecipe(new ItemStack(wand, 1), "M", "D", "S", 'M', mana_block, 'D', Items.diamond, 'S', Items.stick);
 		GameRegistry.addRecipe(new ItemStack(mirror), "III", "I#I", " G ", 'I', Items.iron_ingot, '#', Blocks.glass_pane, 'G', Items.gold_ingot);
 		GameRegistry.addRecipe(new ItemStack(mana_block), "###", "###", "###", '#', mana);
-		GameRegistry.addRecipe(new ItemStack(training_lance_up), "  X", " # ", "#  ", '#', Lance.shaft, 'X', Blocks.wool);
 		
 		GameRegistry.addRecipe(new TrainingLanceRecipe());
+//		GameRegistry.addRecipe(new ItemStack(training_lance_up), "  X", " # ", "#  ", '#', Lance.shaft, 'X', Blocks.wool);
 		
 		GameRegistry.addRecipe(new RecipeArmorDyes());
 		GameRegistry.addRecipe(new RecipeArmor());

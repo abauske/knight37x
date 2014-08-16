@@ -192,7 +192,7 @@ public class EntityTroll extends EntityCreature {
 			if(v != null) {
 				ChunkCoordinates c = v.getCenter();
 				double dist = this.getDistance(c.posX, c.posY, c.posZ);
-				if(dist < 100 && this.rand.nextInt(22) == 1) {
+				if(dist < 100 && this.rand.nextInt(10) == 1) {
 					return super.getCanSpawnHere();
 				}
 			}

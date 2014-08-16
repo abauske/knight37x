@@ -133,7 +133,7 @@ public class RecipeArmor implements IRecipe {
 //			}
 //			if(helmet) return helmet;
 			
-			if(color < 0) {
+			if(color < 0 || color > 15) {
 				color = 7;
 			}
 			
@@ -166,7 +166,7 @@ public class RecipeArmor implements IRecipe {
 						}
 						ItemStack stack = new ItemStack(armor);
 //						armor.setColor(stack, 16252);
-						armor.setColor(stack, color);
+						armor.setColor(stack, this.colors.get(color));
 						return stack;
 //						return this.handleColor(stack, color);
 					}

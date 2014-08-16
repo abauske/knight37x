@@ -76,7 +76,7 @@ public class RenderTrainingLance implements IItemRenderer {
 					if(!tag.hasKey("knockTime")) {
 						tag.setFloat("knockTime", 0.0F);
 					}
-					if(RenderLance.data.getOrDefault(e.getEntityId(), false)) {
+					if(RenderLance.data.containsKey(e.getEntityId()) && RenderLance.data.get(e.getEntityId())) {
 						if(tag.getFloat("knockTime") < 1.0F) {
 							tag.setFloat("knockTime", tag.getFloat("knockTime") + 0.03F);
 						}

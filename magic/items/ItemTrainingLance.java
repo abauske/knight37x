@@ -1,4 +1,4 @@
-package knight37x.magic;
+package knight37x.magic.items;
 
 import static io.netty.buffer.Unpooled.buffer;
 
@@ -24,7 +24,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import knight37x.lance.Lance;
 import knight37x.lance.item.ItemLance;
-import knight37x.magic.items.ItemTrainingArmor;
+import knight37x.magic.Base;
 
 public class ItemTrainingLance extends ItemLance {
 

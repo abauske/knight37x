@@ -89,7 +89,7 @@ public class ItemMayorBow extends ItemBow {
 			double changeZ = 0.0D;
 
 			if (tag.getInteger("spread") == 0) {
-				arrow = new EntityMDArrow[2];
+				arrow = new EntityMDArrow[1];
 			} else {
 				Vec3 vec = player.getLookVec();
 				vec.rotateAroundX(10.0F);
@@ -120,8 +120,7 @@ public class ItemMayorBow extends ItemBow {
 
                 int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, itemstack);
 
-                if (k > 0)
-                {
+                if (k > 0) {
                     arrow[i].setDamage(arrow[i].getDamage() + (double)k * 0.5D + 0.5D);
                 }
 
@@ -136,14 +135,19 @@ public class ItemMayorBow extends ItemBow {
                 {
                     arrow[i].setFire(100);
                 }
+                
+                if (arrow.length == 1) {
+                	arrow[i].setDamage(arrow[i].getDamage() * 1.5F);
+                }
 
                 itemstack.damageItem(1, player);
                 par2World.playSoundAtEntity(player, "random.bow", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 
                 if (flag) {
                     arrow[i].canBePickedUp = 2;
-                } else {
-                    player.inventory.consumeInventoryItem(Items.arrow);
+                } else if(player.inventory.consumeInventoryItem(Items.arrow)) {
+                	arrow[i].setDead();
+                    break;
                 }
 
                 if (!par2World.isRemote)
@@ -160,8 +164,6 @@ public class ItemMayorBow extends ItemBow {
                     
                     
                     par2World.spawnEntityInWorld(arrow[i]);
-//                    par2World.spawnEntityInWorld(arrow2);
-//                    par2World.spawnEntityInWorld(arrow3);
                 }
             }
             

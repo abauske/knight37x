@@ -1,4 +1,4 @@
-package knight37x.magic;
+package knight37x.magic.items;
 
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.enchantment.EnchantmentHelper;

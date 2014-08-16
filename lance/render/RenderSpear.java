@@ -70,7 +70,7 @@ public class RenderSpear implements IItemRenderer {
 				Minecraft.getMinecraft().renderEngine.bindTexture(this.getTexture());
 				
 				if (player.length >= 2 && player[1] != null && player[1] instanceof EntityPlayer) {
-					if(RenderSpear.data.getOrDefault(((Entity) player[1]).getEntityId(), false)) {
+					if(RenderSpear.data.containsKey(((Entity) player[1]).getEntityId()) && RenderSpear.data.get(((Entity) player[1]).getEntityId())) {
 						if(this.knockTime < 2.5F) {
 							this.knockTime += 0.1F;
 						}

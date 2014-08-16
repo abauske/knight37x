@@ -227,7 +227,9 @@ public class Lance {
 		FMLCommonHandler.instance().bus().register(this.eventHandler);
 		MinecraftForge.EVENT_BUS.register(this.eventHandler);
 		
+		System.out.println(1);
 		this.newestVersion = Version.newVersion();
+		System.out.println(2);
 
 		registerRecipes();
 		proxy.registerRenderers();

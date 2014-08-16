@@ -19,6 +19,11 @@ public class TrainingLanceRecipe implements IRecipe {
 			ItemStack shaft2 = craft.getStackInSlot(6);
 			if(wool != null && shaft1 != null && shaft2 != null) {
 				if(wool.getItem() == Item.getItemFromBlock(Blocks.wool) && shaft1.getItem() == Lance.shaft && shaft2.getItem() == Lance.shaft) {
+					for(int i = 0; i < craft.getSizeInventory(); i++) {
+						if(i != 2 && i != 4 && i != 6 && craft.getStackInSlot(i) != null) {
+							return false;
+						}
+					}
 					return true;
 				}
 			}
