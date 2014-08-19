@@ -80,7 +80,7 @@ public class Lance {
 	
 	public static final String modid = "lance",
 			name = "Lance Mod",
-			version = "2.6.0.172";
+			version = "2.6.0.1710";
 	
 	@Instance("lance")
 	public static Lance instance = new Lance();

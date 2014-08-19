@@ -57,7 +57,7 @@ public class Base {
 
 	public static final String modid = "lance_magic",
 			name = "Magic Plugin",
-			version = "1.0.0.172";
+			version = "1.0.0.1710";
 	
 	@Instance("base")
 	public static Base instance = new Base();
