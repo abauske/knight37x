@@ -80,7 +80,7 @@ public class Lance {
 	
 	public static final String modid = "lance",
 			name = "Lance Mod",
-			version = "2.6.0.1710";
+			version = "2.6.1.1710";
 	
 	@Instance("lance")
 	public static Lance instance = new Lance();
@@ -151,6 +151,9 @@ public class Lance {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
+		
+		new Version.NewVersion().start();
+		
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 		craftableSaddle = config.get(Configuration.CATEGORY_GENERAL, "Saddle craftable", true).getBoolean(true);
@@ -227,10 +230,6 @@ public class Lance {
 		FMLCommonHandler.instance().bus().register(this.eventHandler);
 		MinecraftForge.EVENT_BUS.register(this.eventHandler);
 		
-		System.out.println(1);
-		this.newestVersion = Version.newVersion();
-		System.out.println(2);
-
 		registerRecipes();
 		proxy.registerRenderers();
 	}
@@ -244,15 +243,6 @@ public class Lance {
 	public void serverStart(FMLServerStartingEvent event) {
 		ServerCommandManager manager = ((ServerCommandManager) MinecraftServer.getServer().getCommandManager());
 		manager.registerCommand(new LanceAutoUpdate());
-	}
-	
-	@EventHandler
-	public void serverStarted(FMLServerStartedEvent event) {
-		if(event.getSide() != Side.CLIENT) {
-			if(Lance.newestVersion != null && !Lance.newestVersion.isInstalledVersion()) {
-				System.out.println("Version " + Lance.newestVersion.getMCVersion() + " of Lance Mod here available: " + Lance.newestVersion.getDownloadURL());
-			}
-		}
 	}
 	
 	private void registerRecipes()
